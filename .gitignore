@@ -11,8 +11,9 @@
 !/proj.win32/main.cpp
 !/proj.win32/main.h
 !/proj.win32/resource.h
+!/proj.win32/*.sln
 !/proj.win32/*.vcxproj
-!/proj.win32/*.vcxproj.filters
+!/proj.win32/*.vcxproj.*
 !/proj.android/
 !/proj.ios_mac/
 !/proj.linux/

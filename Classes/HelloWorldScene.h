@@ -27,28 +27,18 @@
 
 #include "cocos2d.h"
 
-class HelloWorld : public cocos2d::Layer
+class HelloWorld : public cocos2d::Scene
 {
 public:
     static cocos2d::Scene* createScene();
 
     virtual bool init();
-    bool isKeyPressed(cocos2d::EventKeyboard::KeyCode);
-    double keyPressedDuration(cocos2d::EventKeyboard::KeyCode);
-    void update(float dt);
     
     // a selector callback
     void menuCloseCallback(cocos2d::Ref* pSender);
     
     // implement the "static create()" method manually
     CREATE_FUNC(HelloWorld);
-private:
-    cocos2d::Sprite* sprite;
-    cocos2d::Sprite* sprite2;
-    
-    int moveState = 0;
-    int direction = 0;
-    
 };
 
 #endif // __HELLOWORLD_SCENE_H__

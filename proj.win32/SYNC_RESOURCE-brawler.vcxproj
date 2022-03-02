@@ -19,11 +19,11 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectGuid>{E5CADC5B-F3D1-3662-8D4F-2183955880F2}</ProjectGuid>
+    <ProjectGuid>{74B1555B-1D02-3819-9982-2216101EF88D}</ProjectGuid>
     <WindowsTargetPlatformVersion>10.0.17763.0</WindowsTargetPlatformVersion>
     <Keyword>Win32Proj</Keyword>
     <Platform>Win32</Platform>
-    <ProjectName>ALL_BUILD</ProjectName>
+    <ProjectName>SYNC_RESOURCE-brawler</ProjectName>
     <VCProjectUpgraderObjectName>NoUpgrade</VCProjectUpgraderObjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
@@ -70,6 +70,20 @@
       <InterfaceIdentifierFileName>%(Filename)_i.c</InterfaceIdentifierFileName>
       <ProxyFileName>%(Filename)_p.c</ProxyFileName>
     </Midl>
+    <PostBuildEvent>
+      <Message></Message>
+      <Command>setlocal
+"C:\Program Files\CMake\bin\cmake.exe" -E echo "    copying to C:/Users/n3rdt/brawler/proj.win32/bin/brawler/$(Configuration)/Resources"
+if %errorlevel% neq 0 goto :cmEnd
+C:\Python27\python.exe C:/Users/n3rdt/brawler/cocos2d/cmake/scripts/sync_folder.py -s C:/Users/n3rdt/brawler/Resources -d C:/Users/n3rdt/brawler/proj.win32/bin/brawler/$(Configuration)/Resources
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <Midl>
@@ -80,6 +94,20 @@
       <InterfaceIdentifierFileName>%(Filename)_i.c</InterfaceIdentifierFileName>
       <ProxyFileName>%(Filename)_p.c</ProxyFileName>
     </Midl>
+    <PostBuildEvent>
+      <Message></Message>
+      <Command>setlocal
+"C:\Program Files\CMake\bin\cmake.exe" -E echo "    copying to C:/Users/n3rdt/brawler/proj.win32/bin/brawler/$(Configuration)/Resources"
+if %errorlevel% neq 0 goto :cmEnd
+C:\Python27\python.exe C:/Users/n3rdt/brawler/cocos2d/cmake/scripts/sync_folder.py -s C:/Users/n3rdt/brawler/Resources -d C:/Users/n3rdt/brawler/proj.win32/bin/brawler/$(Configuration)/Resources
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Win32'">
     <Midl>
@@ -90,6 +118,20 @@
       <InterfaceIdentifierFileName>%(Filename)_i.c</InterfaceIdentifierFileName>
       <ProxyFileName>%(Filename)_p.c</ProxyFileName>
     </Midl>
+    <PostBuildEvent>
+      <Message></Message>
+      <Command>setlocal
+"C:\Program Files\CMake\bin\cmake.exe" -E echo "    copying to C:/Users/n3rdt/brawler/proj.win32/bin/brawler/$(Configuration)/Resources"
+if %errorlevel% neq 0 goto :cmEnd
+C:\Python27\python.exe C:/Users/n3rdt/brawler/cocos2d/cmake/scripts/sync_folder.py -s C:/Users/n3rdt/brawler/Resources -d C:/Users/n3rdt/brawler/proj.win32/bin/brawler/$(Configuration)/Resources
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Win32'">
     <Midl>
@@ -100,7 +142,77 @@
       <InterfaceIdentifierFileName>%(Filename)_i.c</InterfaceIdentifierFileName>
       <ProxyFileName>%(Filename)_p.c</ProxyFileName>
     </Midl>
+    <PostBuildEvent>
+      <Message></Message>
+      <Command>setlocal
+"C:\Program Files\CMake\bin\cmake.exe" -E echo "    copying to C:/Users/n3rdt/brawler/proj.win32/bin/brawler/$(Configuration)/Resources"
+if %errorlevel% neq 0 goto :cmEnd
+C:\Python27\python.exe C:/Users/n3rdt/brawler/cocos2d/cmake/scripts/sync_folder.py -s C:/Users/n3rdt/brawler/Resources -d C:/Users/n3rdt/brawler/proj.win32/bin/brawler/$(Configuration)/Resources
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
+  <ItemGroup>
+    <CustomBuild Include="C:\Users\n3rdt\brawler\proj.win32\CMakeFiles\85cc76164a3ad84b5ca80fb6d2d02704\SYNC_RESOURCE-brawler.rule">
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'"></Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">setlocal
+"C:\Program Files\CMake\bin\cmake.exe" -E echo "Copying resources for brawler ..."
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">C:\Users\n3rdt\brawler\proj.win32\CMakeFiles\SYNC_RESOURCE-brawler</Outputs>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</LinkObjects>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|Win32'"></Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">setlocal
+"C:\Program Files\CMake\bin\cmake.exe" -E echo "Copying resources for brawler ..."
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">C:\Users\n3rdt\brawler\proj.win32\CMakeFiles\SYNC_RESOURCE-brawler</Outputs>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</LinkObjects>
+      <Message Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Win32'"></Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Win32'">setlocal
+"C:\Program Files\CMake\bin\cmake.exe" -E echo "Copying resources for brawler ..."
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Win32'">%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Win32'">C:\Users\n3rdt\brawler\proj.win32\CMakeFiles\SYNC_RESOURCE-brawler</Outputs>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Win32'">false</LinkObjects>
+      <Message Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Win32'"></Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Win32'">setlocal
+"C:\Program Files\CMake\bin\cmake.exe" -E echo "Copying resources for brawler ..."
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Win32'">%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Win32'">C:\Users\n3rdt\brawler\proj.win32\CMakeFiles\SYNC_RESOURCE-brawler</Outputs>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Win32'">false</LinkObjects>
+    </CustomBuild>
+  </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="C:\Users\n3rdt\brawler\CMakeLists.txt">
       <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Building Custom Rule C:/Users/n3rdt/brawler/CMakeLists.txt</Message>
@@ -158,6 +270,8 @@ if %errorlevel% neq 0 goto :VCEnd</Command>
     </CustomBuild>
   </ItemGroup>
   <ItemGroup>
+    <None Include="C:\Users\n3rdt\brawler\proj.win32\CMakeFiles\SYNC_RESOURCE-brawler">
+    </None>
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="C:\Users\n3rdt\brawler\proj.win32\ZERO_CHECK.vcxproj">
@@ -165,64 +279,6 @@ if %errorlevel% neq 0 goto :VCEnd</Command>
       <Name>ZERO_CHECK</Name>
       <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
       <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-    </ProjectReference>
-    <ProjectReference Include="C:\Users\n3rdt\brawler\proj.win32\SYNC_RESOURCE-brawler.vcxproj">
-      <Project>{74B1555B-1D02-3819-9982-2216101EF88D}</Project>
-      <Name>SYNC_RESOURCE-brawler</Name>
-      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
-      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-    </ProjectReference>
-    <ProjectReference Include="C:\Users\n3rdt\brawler\proj.win32\brawler.vcxproj">
-      <Project>{0E20FE7A-C4AC-300D-927D-F513B957D2AF}</Project>
-      <Name>brawler</Name>
-    </ProjectReference>
-    <ProjectReference Include="C:\Users\n3rdt\brawler\proj.win32\engine\cocos\core\cocos2d.vcxproj">
-      <Project>{4EF721E0-5CD7-32EF-86A6-DEE7992B9365}</Project>
-      <Name>cocos2d</Name>
-    </ProjectReference>
-    <ProjectReference Include="C:\Users\n3rdt\brawler\proj.win32\engine\external\clipper\ext_clipper.vcxproj">
-      <Project>{9234A6AA-3E95-33FE-B5F6-9393D37472BA}</Project>
-      <Name>ext_clipper</Name>
-    </ProjectReference>
-    <ProjectReference Include="C:\Users\n3rdt\brawler\proj.win32\engine\external\ConvertUTF\ext_convertUTF.vcxproj">
-      <Project>{693BD24C-152A-3C1B-9929-1D644477E5A8}</Project>
-      <Name>ext_convertUTF</Name>
-    </ProjectReference>
-    <ProjectReference Include="C:\Users\n3rdt\brawler\proj.win32\engine\external\edtaa3func\ext_edtaa3func.vcxproj">
-      <Project>{8826504D-3298-34AC-9592-D53C4E19BA8C}</Project>
-      <Name>ext_edtaa3func</Name>
-    </ProjectReference>
-    <ProjectReference Include="C:\Users\n3rdt\brawler\proj.win32\engine\external\md5\ext_md5.vcxproj">
-      <Project>{1A256726-CD52-3BC6-988E-3C0DA9A47DF3}</Project>
-      <Name>ext_md5</Name>
-    </ProjectReference>
-    <ProjectReference Include="C:\Users\n3rdt\brawler\proj.win32\engine\external\poly2tri\ext_poly2tri.vcxproj">
-      <Project>{0CE22115-B9D3-38B1-9EDA-2DABBD9759C8}</Project>
-      <Name>ext_poly2tri</Name>
-    </ProjectReference>
-    <ProjectReference Include="C:\Users\n3rdt\brawler\proj.win32\engine\external\recast\ext_recast.vcxproj">
-      <Project>{0F0B24E1-1733-39B3-A73E-346D758BE9A8}</Project>
-      <Name>ext_recast</Name>
-    </ProjectReference>
-    <ProjectReference Include="C:\Users\n3rdt\brawler\proj.win32\engine\external\tinyxml2\ext_tinyxml2.vcxproj">
-      <Project>{B551A1D8-88BC-31CE-9E52-79A990464BAC}</Project>
-      <Name>ext_tinyxml2</Name>
-    </ProjectReference>
-    <ProjectReference Include="C:\Users\n3rdt\brawler\proj.win32\engine\external\unzip\ext_unzip.vcxproj">
-      <Project>{876197BA-C0A6-38A4-96EB-8662FEEA1FD3}</Project>
-      <Name>ext_unzip</Name>
-    </ProjectReference>
-    <ProjectReference Include="C:\Users\n3rdt\brawler\proj.win32\engine\external\xxhash\ext_xxhash.vcxproj">
-      <Project>{E0446998-217A-36CE-95E7-AA2D645D1C98}</Project>
-      <Name>ext_xxhash</Name>
-    </ProjectReference>
-    <ProjectReference Include="C:\Users\n3rdt\brawler\proj.win32\engine\external\xxtea\ext_xxtea.vcxproj">
-      <Project>{1DDF0F24-20C1-380E-866B-AC1356ADFEAA}</Project>
-      <Name>ext_xxtea</Name>
-    </ProjectReference>
-    <ProjectReference Include="C:\Users\n3rdt\brawler\proj.win32\engine\external\external.vcxproj">
-      <Project>{48434942-C2D7-35A9-82F1-60D72272DCE6}</Project>
-      <Name>external</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

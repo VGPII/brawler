@@ -23,213 +23,110 @@
  ****************************************************************************/
 
 #include "HelloWorldScene.h"
-#include "AudioEngine.h"
-
 
 USING_NS_CC;
-float gravity = -9.80f;
-float force = 1* gravity;
-float velocity1 = 0.0f;
-float velocity2 = 0.0f;
-float acceleration = force;
-
-Size screenSize = Director::getInstance()->getWinSize();
-float positionX1 = 400;
-
-float positionY1 = 200;
-
-float positionX2 = 200;
-float positionY2 = 200;
-bool keyDown = false;
-int keyDirection;
-Vec2 sprite_position1;
-Vec2 sprite_position2;
-bool isBouncingEnabled = true;
-
-float deadZone = 0.1;
-
-bool playAudio = false;
 
 Scene* HelloWorld::createScene()
 {
-    auto scene = Scene::create();
-    auto layer = HelloWorld::create();
-    scene->addChild(layer);
-    return scene;
-  
+    return HelloWorld::create();
 }
 
-bool HelloWorld::init() 
+// Print useful error message instead of segfaulting when files are not there.
+static void problemLoading(const char* filename)
 {
-    
-    
-    if (!Layer::init()) {
+    printf("Error while loading: %s\n", filename);
+    printf("Depending on how you compiled you might have to add 'Resources/' in front of filenames in HelloWorldScene.cpp\n");
+}
+
+// on "init" you need to initialize your instance
+bool HelloWorld::init()
+{
+    //////////////////////////////
+    // 1. super init first
+    if ( !Scene::init() )
+    {
         return false;
     }
-    sprite = Sprite::create("ball_blue.png");
-    sprite2 = Sprite::create("ball_red.png");
-    sprite->setPosition(positionX1, positionY1);
-    sprite2->setPosition(positionX2, positionY2);
-    sprite_position1 = sprite->getPosition();
-    sprite_position2 = sprite2->getPosition();
-    this->addChild(sprite);
-    this->addChild(sprite2);
-    sprite->setAnchorPoint(Vec2(0, 0));
-    this->scheduleUpdate(); // This is needed in order for the update method to activate
-    auto eventListener = EventListenerKeyboard::create();
-    eventListener->onKeyPressed = [](EventKeyboard::KeyCode keyCode, Event* event) {
-        Vec2 loc = event->getCurrentTarget()->getPosition();
-        switch (keyCode) {
-        case EventKeyboard::KeyCode::KEY_LEFT_ARROW:
-        case EventKeyboard::KeyCode::KEY_A:
-            keyDown = true;
-            keyDirection = 4;
-            break;
-        case EventKeyboard::KeyCode::KEY_RIGHT_ARROW:
-        case EventKeyboard::KeyCode::KEY_D:
-            keyDown = true;
-            keyDirection = 3;
-            break;
-        case EventKeyboard::KeyCode::KEY_UP_ARROW:
-        case EventKeyboard::KeyCode::KEY_W:
-            keyDown = true;
-            keyDirection = 1;
-            break;
-        case EventKeyboard::KeyCode::KEY_DOWN_ARROW:
-        case EventKeyboard::KeyCode::KEY_S:
-            keyDown = true;
-            keyDirection = 2;
-            break;
-        }
 
-    };
-    eventListener->onKeyReleased = [](EventKeyboard::KeyCode keyCode, Event* event) {
-        Vec2 loc = event->getCurrentTarget()->getPosition();
-        switch (keyCode) {
-        case EventKeyboard::KeyCode::KEY_LEFT_ARROW:
-        case EventKeyboard::KeyCode::KEY_A:
-            keyDown = false;
-            break;
-        case EventKeyboard::KeyCode::KEY_RIGHT_ARROW:
-        case EventKeyboard::KeyCode::KEY_D:
-            keyDown = false;
-            break;
-        case EventKeyboard::KeyCode::KEY_UP_ARROW:
-        case EventKeyboard::KeyCode::KEY_W:
-            keyDown = false;
-            break;
-        case EventKeyboard::KeyCode::KEY_DOWN_ARROW:
-        case EventKeyboard::KeyCode::KEY_S:
-            keyDown = false;
-            break;
+    auto visibleSize = Director::getInstance()->getVisibleSize();
+    Vec2 origin = Director::getInstance()->getVisibleOrigin();
 
-        }
-    };
-    this->_eventDispatcher->addEventListenerWithSceneGraphPriority(eventListener, this);
+    /////////////////////////////
+    // 2. add a menu item with "X" image, which is clicked to quit the program
+    //    you may modify it.
+
+    // add a "close" icon to exit the progress. it's an autorelease object
+    auto closeItem = MenuItemImage::create(
+                                           "CloseNormal.png",
+                                           "CloseSelected.png",
+                                           CC_CALLBACK_1(HelloWorld::menuCloseCallback, this));
+
+    if (closeItem == nullptr ||
+        closeItem->getContentSize().width <= 0 ||
+        closeItem->getContentSize().height <= 0)
+    {
+        problemLoading("'CloseNormal.png' and 'CloseSelected.png'");
+    }
+    else
+    {
+        float x = origin.x + visibleSize.width - closeItem->getContentSize().width/2;
+        float y = origin.y + closeItem->getContentSize().height/2;
+        closeItem->setPosition(Vec2(x,y));
+    }
+
+    // create menu, it's an autorelease object
+    auto menu = Menu::create(closeItem, NULL);
+    menu->setPosition(Vec2::ZERO);
+    this->addChild(menu, 1);
+
+    /////////////////////////////
+    // 3. add your codes below...
+
+    // add a label shows "Hello World"
+    // create and initialize a label
+
+    auto label = Label::createWithTTF("Hello World", "fonts/Marker Felt.ttf", 24);
+    if (label == nullptr)
+    {
+        problemLoading("'fonts/Marker Felt.ttf'");
+    }
+    else
+    {
+        // position the label on the center of the screen
+        label->setPosition(Vec2(origin.x + visibleSize.width/2,
+                                origin.y + visibleSize.height - label->getContentSize().height));
+
+        // add the label as a child to this layer
+        this->addChild(label, 1);
+    }
+
+    // add "HelloWorld" splash screen"
+    auto sprite = Sprite::create("HelloWorld.png");
+    if (sprite == nullptr)
+    {
+        problemLoading("'HelloWorld.png'");
+    }
+    else
+    {
+        // position the sprite on the center of the screen
+        sprite->setPosition(Vec2(visibleSize.width/2 + origin.x, visibleSize.height/2 + origin.y));
+
+        // add the sprite as a child to this layer
+        this->addChild(sprite, 0);
+    }
     return true;
 }
-void HelloWorld::update(float dt) {
-    CCLOG("Screen Size %f", screenSize.width);
-
-    velocity1 += gravity;
-    sprite_position1.y += velocity1*0.1;
-    if (sprite_position1.y <= 25) {
-        if (playAudio) {
-            AudioEngine::play2d("bounce.mp3");
-        }
-        velocity1 *= -1;
-        sprite_position1.y = 26.1;
-    }
-    
-   
-    
-    if (keyDown) {
-        switch (keyDirection) {
-        case(1):
-            sprite_position1.y += 1; 
-            break;
-
-        case(2):
-            sprite_position1.y -= 1;
-            break;
-        case(3):
-            sprite_position1.x += 1;
-            break;
-        case(4):
-            sprite_position1.x -= 1;
-            break;
-        }
-        
-    }
-    sprite->setPosition(sprite_position1.x, sprite_position1.y);
-    //CCLOG("Hi", 5); // Debug values
-   
-    int controller_presence = glfwJoystickPresent(GLFW_JOYSTICK_1); 
-    //CCLOG("Controller Presence %d", controller_presence);
-   // CCLOG(glfwGetVersionString());
-    if (controller_presence >= 1) {
-        sprite2->setVisible(true);
-        int axesCount;
-        const float *axes = glfwGetJoystickAxes(GLFW_JOYSTICK_1, &axesCount);
-        if (axes[0] > deadZone) {
-            sprite_position2.x += 2 * axes[0];
-
-        }
-        if (axes[0] < 0) {
-            sprite_position2.x += 2 * axes[0];
-
-        }
-        if (axes[1] > deadZone) {
-            sprite_position2.y -= 2 * axes[1];
-        }
-        if (axes[1] < 0) {
-            sprite_position2.y -= 2 * axes[1];
-        }
-
-        velocity2 += gravity;
-        sprite_position2.y += velocity2 * 0.1;
-        if (sprite_position2.y <= 25) {
-            if (playAudio) {
-                AudioEngine::play2d("bounce.mp3");
-            }
-            velocity2 *= -1;
-            sprite_position2.y = 26.1;
-        }
-
-        //Rumble will take a little bit more effort
-        sprite2->setPosition(sprite_position2.x, sprite_position2.y);
-        CCLOG("\n\n\n\n\n");
-        CCLOG("Number of Axes: %d", axesCount);// Most controllers have 4 axis (x,y for each stick), but some have 6 (analog triggers)
-       // Main problem is dead zone (when the stick is in the center the function does not return exactly 0)
-        CCLOG("Left Stick X Axis: %f", axes[0]); // Returns a value between -1 and 1
-        CCLOG("Left Stick Y Axis: %f", axes[1]);
-        CCLOG("Right Stick X Axis: %f", axes[2]);
-        CCLOG("Right Stick Y Axis : %f", axes[3]);
-       // CCLOG("Left Trigger/L2: %f", axes[4]);
-       // CCLOG("Right Trigger/R2: %f", axes[5]);
-        int buttonCount;
-        const unsigned char* buttons = glfwGetJoystickButtons(GLFW_JOYSTICK_1, &buttonCount);
-        if (GLFW_PRESS == buttons[1]) {
-            CCLOG("A button Pressed");
-            if (playAudio) {
-                playAudio = false;
-            }
-            else {
-                playAudio = true;
-            }
-            
-        }
-        if (GLFW_RELEASE == buttons[2]) {
-            CCLOG("A button Released");
-        }
-        const char* name = glfwGetJoystickName(GLFW_JOYSTICK_1);
-        CCLOG("The name of the Joystick / gamepad is: %s", name);
 
 
-    }
-    else {
-        sprite2->setVisible(false);
-    }
+void HelloWorld::menuCloseCallback(Ref* pSender)
+{
+    //Close the cocos2d-x game scene and quit the application
+    Director::getInstance()->end();
+
+    /*To navigate back to native iOS screen(if present) without quitting the application  ,do not use Director::getInstance()->end() as given above,instead trigger a custom event created in RootViewController.mm as below*/
+
+    //EventCustom customEndEvent("game_scene_close_event");
+    //_eventDispatcher->dispatchEvent(&customEndEvent);
 
 
 }
