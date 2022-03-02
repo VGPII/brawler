@@ -1,7 +1,24 @@
-cocos2d/
-proj.android/
-proj.ios_mac/
-proj.linux
-proj.win32
-.cocos-project.json
-CmakeLists.txt
+# Implmented GitIgnore more like a whitelist
+# Ignore everything, but then allow specific folders/files
+/*
+
+!/Classes/
+!/proj.win32/
+/proj.win32/*
+!/proj.win32/res/
+!/proj.win32/build-cfg.json
+!/proj.win32/game.rc
+!/proj.win32/main.cpp
+!/proj.win32/main.h
+!/proj.win32/resource.h
+!/proj.win32/*.vcxproj
+!/proj.win32/*.vcxproj.filters
+!/proj.android/
+!/proj.ios_mac/
+!/proj.linux/
+!/cocos2d/
+!/Resources/
+!/.cocos-project.json
+!/CmakeLists.txt
+!/.git/
+!/.gitignore
