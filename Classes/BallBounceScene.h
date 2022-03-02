@@ -22,43 +22,33 @@
  THE SOFTWARE.
  ****************************************************************************/
 
-#ifndef  _APP_DELEGATE_H_
-#define  _APP_DELEGATE_H_
+#ifndef __BALLBOUNCE_SCENE_H__
+#define __BALLBOUNCE_SCENE_H__
 
 #include "cocos2d.h"
 
- /**
- @brief    The cocos2d Application.
-
- Private inheritance here hides part of interface from Director.
- */
-class  AppDelegate : private cocos2d::Application
+class BallBounce : public cocos2d::Scene
 {
 public:
-	AppDelegate();
-	virtual ~AppDelegate();
+	static cocos2d::Scene* createScene();
 
-	virtual void initGLContextAttrs();
+	virtual bool init();
 
-	/**
-	@brief    Implement Director and Scene init code here.
-	@return true    Initialize success, app continue.
-	@return false   Initialize failed, app terminate.
-	*/
-	virtual bool applicationDidFinishLaunching();
+	CREATE_FUNC(BallBounce);
 
-	/**
-	@brief  Called when the application moves to the background
-	@param  the pointer of the application
-	*/
-	virtual void applicationDidEnterBackground();
+	void update(float) override;
 
-	/**
-	@brief  Called when the application reenters the foreground
-	@param  the pointer of the application
-	*/
-	virtual void applicationWillEnterForeground();
+	cocos2d::Sprite *ballSprite;
+	cocos2d::Vec2 position;
+	cocos2d::Vec2 velocity;
+	cocos2d::Vec2 acceleration;
+	cocos2d::Vec2 gravity;
+
+	bool canJump;
+	float maxVel = 500;
+	float radius;
+
+
 };
 
-#endif // _APP_DELEGATE_H_
-
+#endif // __BALLBOUNCE_SCENE_H__
