@@ -2,6 +2,8 @@
 # Ignore everything, but then allow specific folders/files
 /*
 
+!/LICENSE
+!/README.md
 !/Classes/
 !/Resources/
 !/.git/
