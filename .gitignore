@@ -1,10 +1,14 @@
 # Implmented GitIgnore more like a whitelist
 # Ignore everything, but then allow specific folders/files
-/*
+# /*
 
-!/LICENSE
-!/README.md
+# !/LICENSE
+# !/README.md
+# !/quantumQuarrel/
+# !/quantumQuarrel/Classes/
+# !/quantumQuarrel/Resources/
+# !/.git/
+# !/.gitignore
+/quantumQuarrel/*
 !/quantumQuarrel/Classes/
 !/quantumQuarrel/Resources/
-!/.git/
-!/.gitignore
