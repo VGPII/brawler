@@ -1,7 +1,9 @@
 # Quantum Quarrel
 
 ## Build instructions
-- While in root folder of the github, run
+- While in root folder of the github
+- delete the 'quantumQarrel/' folder
+- run:
 > `cocos new quantumQuarrel -l cpp -p com.vgProg2.quantumQuarrel`<br />
 > `cd .\quantumQuarrel\proj.win32\`<br />
 > `cmake .. -G "Visual Studio 15 2017" -AWin32`<br />
@@ -13,17 +15,9 @@
 - select 'Set as StartUp Project'
 - run the debugger again
 - the default project should now run 
-
-## Pull instructions
-- Pull from github normally
-- copy the files inside the 'classes' folder at the root of the github directory
-- paste them into the solution explorer classes folder located inside of Source Files
-- copy the files inside the 'resources' folder at the root of the github directory
-- paste them into the solution explorer resources folder
-
-## Push instructions
-- copy the files inside the solution explorer classes folder located inside of Source Files
-- paste them into the 'classes' folder at the root of the github directory
-- copy the files inside the solution explorer resources folder
-- paste the files inside the 'resources' folder at the root of the github directory
-- continue to push as normal
+- close the running project
+- run `git restore .` to pull the source files back
+- delete the files in the 'classes' folder in the solution explorer
+- drag and drop the files in the source folders to the solution explorer
+- repeate the last two steps for the resources folder
+- build again and you should be caught up
