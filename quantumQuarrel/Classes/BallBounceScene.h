@@ -40,16 +40,19 @@ public:
 	Vec2 tileCoordForPosition(Vec2 position); // Converting pixel values to x,y coordinates on the tilemap
 	void setViewPointCenter(Vec2 position); // Centering the camera around the ball sprite
 	bool InAir(Vec2 position);
+	bool hitDeathPlane(Vec2 currentPosition);
 
 	Sprite *ballSprite;
 	Vec2 position;
 	Vec2 velocity;
 	Vec2 acceleration;
 	Vec2 gravity;
+	Vec2 SpawnpointP1;
 
 	TMXTiledMap* _MainMap;
 	TMXLayer* _background;
 	TMXLayer* _ground;
+	TMXLayer* _DeathPlane;
 	TMXObjectGroup* objectGroup;
 	ValueMap* playerSpawnPoint;
 

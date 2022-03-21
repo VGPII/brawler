@@ -71,6 +71,7 @@ bool BallBounce::init()
 	_MainMap = TMXTiledMap::create("mainMap.tmx");
 	auto background = _MainMap->getLayer("Background");
 	_ground = _MainMap->getLayer("Collision");
+	_DeathPlane = _MainMap->getLayer("Death_Plane");
 	this->addChild(_MainMap);
 	objectGroup = _MainMap->getObjectGroup("SpawnPoints");
 
@@ -78,13 +79,12 @@ bool BallBounce::init()
 		CCLOG("Tile map does not have an object layer");
 	}
 	ValueMap spawnPoint = objectGroup->getObject("SpawnPointP1");
-	int x = spawnPoint.at("x").asInt();
-	int y = spawnPoint.at("y").asInt();
+	SpawnpointP1 = Vec2(spawnPoint.at("x").asInt(), spawnPoint.at("y").asInt());
 
 	ballSprite = Sprite::create("ball.png");
 	
 	//ballSprite->setPosition(Point((visibleSize.width / 2) + origin.x, (visibleSize.height / 2) + origin.y));
-	ballSprite->setPosition(Vec2(x, y));
+	ballSprite->setPosition(SpawnpointP1);
 	this->setViewPointCenter(ballSprite->getPosition());
 	this->addChild(ballSprite);
 	position = ballSprite->getPosition();
@@ -102,6 +102,14 @@ bool BallBounce::init()
 }
 
 void BallBounce::update(float dt) {
+	if (hitDeathPlane(position)) {
+		position = SpawnpointP1;
+		ballSprite->setPosition(position);
+		velocity = Vec2(0, 0);
+		acceleration = Vec2(0, 0);
+		
+		return;
+	}
 	if (InAir(position)) {
 		onGround = false;
 		acceleration = cocos2d::Vec2(0, 0);
@@ -178,20 +186,27 @@ void BallBounce::update(float dt) {
 		}
 	}
 	if (onGround) {
-		gravity = Vec2(0,0);
+		if (velocity.y < 0) {
+			acceleration.y = 0;
+			velocity.y = 0;
+			canJump = true;
+		}
+		velocity += acceleration;
 	}
-	velocity += acceleration + gravity * dt;
-	
+	else {
+		velocity += acceleration + gravity * dt;
+	}
 
 	position += velocity * dt;
+	
 	ballSprite->setPosition(position);
 	//this->setViewPointCenter(position);
 }
 void BallBounce::setViewPointCenter(Vec2 Position) {
 	Size winSize = cocos2d::Director::getInstance()->getWinSize(); // Getting the window size
 	//These functions Make sure the camera stops following the player once they get "Off screen"
-	int x = MAX(position.x, winSize.width / 2);
-	int y = MAX(position.y, winSize.height / 2);
+	int x = MAX(Position.x, winSize.width / 2);
+	int y = MAX(Position.y, winSize.height / 2);
 	x = MIN(x, (_MainMap->getMapSize().width * this->_MainMap->getTileSize().width) - winSize.width / 2);
 	y = MIN(y, (_MainMap->getMapSize().height * _MainMap->getTileSize().height) - winSize.height / 2);
 
@@ -210,7 +225,7 @@ Vec2 BallBounce::tileCoordForPosition(Vec2 CurrentPosition) {
 }
 
 bool BallBounce::InAir(Vec2 Currentposition){
-	Vec2 tileCoord = tileCoordForPosition(position);
+	Vec2 tileCoord = tileCoordForPosition(Currentposition);
 	int tileGid = _ground->getTileGIDAt(tileCoord);
 	if (tileGid) {
 		ValueMap properties = _MainMap->getPropertiesForGID(tileGid).asValueMap();
@@ -224,6 +239,25 @@ bool BallBounce::InAir(Vec2 Currentposition){
 	}
 	
 	return true;
+}
+bool BallBounce::hitDeathPlane(Vec2 currentPosition) {
+	Vec2 tileCoord = tileCoordForPosition(currentPosition);
+	int tileGid = _DeathPlane->getTileGIDAt(tileCoord);
+	if (tileGid) {
+		//ValueMap properties = _MainMap->getPropertiesForGID(tileGid).asValueMap();
+		//if (properties.size() > 0) {
+		//	std::string plane;
+			
+			//plane = properties.at("Collidable").asString();
+			//CCLOG("Props %S",properties.at("Death_Plane"));
+			//if (plane.compare("True")) {
+				return true;
+			}
+		//}
+	//}
+
+	return false;
+
 }
 
 
