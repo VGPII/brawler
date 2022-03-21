@@ -26,7 +26,7 @@
 #define __BALLBOUNCE_SCENE_H__
 
 #include "cocos2d.h"
-
+using namespace cocos2d;
 class BallBounce : public cocos2d::Scene
 {
 public:
@@ -37,14 +37,25 @@ public:
 	CREATE_FUNC(BallBounce);
 
 	void update(float) override;
+	Vec2 tileCoordForPosition(Vec2 position); // Converting pixel values to x,y coordinates on the tilemap
+	void setViewPointCenter(Vec2 position); // Centering the camera around the ball sprite
+	bool InAir(Vec2 position);
 
-	cocos2d::Sprite *ballSprite;
-	cocos2d::Vec2 position;
-	cocos2d::Vec2 velocity;
-	cocos2d::Vec2 acceleration;
-	cocos2d::Vec2 gravity;
+	Sprite *ballSprite;
+	Vec2 position;
+	Vec2 velocity;
+	Vec2 acceleration;
+	Vec2 gravity;
+
+	TMXTiledMap* _MainMap;
+	TMXLayer* _background;
+	TMXLayer* _ground;
+	TMXObjectGroup* objectGroup;
+	ValueMap* playerSpawnPoint;
+
 
 	bool canJump;
+	bool onGround;
 	float maxVel = 500;
 	float radius;
 
