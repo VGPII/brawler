@@ -1,5 +1,5 @@
 #Displaying tiles
-#Instructions
+##Instructions
 -First you will Need to install Tiled:
 [Tiled] (https://www.mapeditor.org/)
 
@@ -7,7 +7,7 @@
 -Once you have it installed open the file with the .tmx extension (right now it is mainMap)  in the Resources folder
 
 - Once you open it you should see several errors like this:
--![Image](http://url/to/img.png)
+-![Image](https://github.com/VGPII/brawler/blob/main/Error.png)
 - This is due to the directory of each image needing to be remaped to your host device.
 
 
