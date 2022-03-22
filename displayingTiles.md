@@ -12,13 +12,13 @@
 
 
 - 1. Select one of the errors, and pay attention to the name as it will be important, and select open tileset (reference the image above).
--This will lead to a blank screen as the program doesn't know where the tileset is.
--Once you see the blank screen select "locate file" which is in the same place as open tileset
--This should open your file explorer.
-- Go to your resources directory.
-- Select the file that has the same name as the one you selected in tilemap, but make sure the file you select is a .tsx file.
-- The tsx file is an xml file that maps to the .png file and contains information about the tiles properties.
--Once you select / open the file the error should disapper and the tileset should display in the output window.
+- 2.This will lead to a blank screen as the program doesn't know where the tileset is.
+- 3. Once you see the blank screen select "locate file" which is in the same place as open tileset
+- 4.This should open your file explorer.
+- 5. Go to your resources directory.
+- 6. Select the file that has the same name as the one you selected in tilemap, but make sure the file you select is a .tsx file.
+- 7. The tsx file is an xml file that maps to the .png file and contains information about the tiles properties.
+- 8. Once you select / open the file the error should disapper and the tileset should display in the output window.
 
 - Repeat this process until you remapped all of the .tsx files.
 - Once you finish this save the tilemap file, and attempt to compile the code.
