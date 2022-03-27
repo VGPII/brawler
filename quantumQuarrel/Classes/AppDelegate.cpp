@@ -23,6 +23,7 @@
  ****************************************************************************/
 
 #include "BallBounceScene.h"
+#include "MainMenu.h"
 #include "AppDelegate.h"
 
  // #define USE_AUDIO_ENGINE 1
@@ -109,9 +110,10 @@ bool AppDelegate::applicationDidFinishLaunching() {
 
 	// create a scene. it's an autorelease object
 	auto scene = BallBounce::createScene();
+	auto main = MainMenu::createScene();
 
 	// run
-	director->runWithScene(scene);
+	director->runWithScene(main);
 
 	return true;
 }

@@ -51,7 +51,10 @@ USING_NS_CC;
 
 Scene* BallBounce::createScene()
 {
-	return BallBounce::create();
+	auto scene = Scene::create();
+	auto layer = BallBounce::create();
+	scene->addChild(layer);
+	return scene;
 }
 
 // on "init" you need to initialize your instance
@@ -69,6 +72,8 @@ bool BallBounce::init()
 
 	
 	_MainMap = TMXTiledMap::create("mainMap.tmx");
+	//_MainMap->setScaleX((visibleSize.width / _MainMap->getContentSize().width) * 1);
+	//_MainMap->setScaleY((visibleSize.height / _MainMap->getContentSize().height) * 1);
 	auto background = _MainMap->getLayer("Background");
 	_ground = _MainMap->getLayer("Collision");
 	_DeathPlane = _MainMap->getLayer("Death_Plane");
