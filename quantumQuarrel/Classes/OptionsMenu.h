@@ -53,11 +53,6 @@ public:
 	int NUM_OF_MENU_ITEMS = 2;
 	int previousCursorPosition;
 	bool cursorMoved;
-
-
-
-
-
 };
 
 #endif // __MAINMENU__H__

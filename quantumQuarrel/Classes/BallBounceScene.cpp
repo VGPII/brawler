@@ -76,7 +76,10 @@ bool BallBounce::init()
 	//_MainMap->setScaleY((visibleSize.height / _MainMap->getContentSize().height) * 1);
 	auto background = _MainMap->getLayer("Background");
 	_ground = _MainMap->getLayer("Collision");
+	
+	_ground->setVisible(false);
 	_DeathPlane = _MainMap->getLayer("Death_Plane");
+	_DeathPlane->setVisible(false);
 	this->addChild(_MainMap);
 	objectGroup = _MainMap->getObjectGroup("SpawnPoints");
 
@@ -87,10 +90,13 @@ bool BallBounce::init()
 	SpawnpointP1 = Vec2(spawnPoint.at("x").asInt(), spawnPoint.at("y").asInt());
 
 	ballSprite = Sprite::create("ball.png");
-	
+	testBall = Sprite::create("ball_blue.png");
 	//ballSprite->setPosition(Point((visibleSize.width / 2) + origin.x, (visibleSize.height / 2) + origin.y));
 	ballSprite->setPosition(SpawnpointP1);
+	testBall->setPosition(SpawnpointP1.x+300, SpawnpointP1.y);
+
 	this->setViewPointCenter(ballSprite->getPosition());
+	this->addChild(testBall);
 	this->addChild(ballSprite);
 	position = ballSprite->getPosition();
 	velocity = cocos2d::Vec2(0, 0);
@@ -107,6 +113,8 @@ bool BallBounce::init()
 }
 
 void BallBounce::update(float dt) {
+	CCLOG("Player Position %f", ballSprite->getPosition().x);
+	CCLOG("Enemy Position %f", testBall->getPosition().x);
 	if (hitDeathPlane(position)) {
 		position = SpawnpointP1;
 		ballSprite->setPosition(position);
@@ -206,6 +214,7 @@ void BallBounce::update(float dt) {
 	position += velocity * dt;
 	
 	ballSprite->setPosition(position);
+	checkForCollision(ballSprite, testBall);
 	//this->setViewPointCenter(position);
 }
 void BallBounce::setViewPointCenter(Vec2 Position) {
@@ -222,6 +231,16 @@ void BallBounce::setViewPointCenter(Vec2 Position) {
 	viewPoint.subtract(actualposition);
 
 	this->setPosition(viewPoint);
+}
+void BallBounce::checkForCollision(Sprite* Attacker, Sprite* Reciver) {
+	if (Attacker->getPosition().x == Reciver->getPosition().x || abs(Attacker->getPosition().x - Reciver->getPosition().x)< 10){// Change this value to be the radius of the sprite
+		if (Attacker->getPosition().y == Reciver->getPosition().y || abs(Attacker->getPosition().y - Reciver->getPosition().y)< 10) {
+			CCLOG("Collison");
+			//Insert momentum calculations here
+		}
+	}
+	
+
 }
 Vec2 BallBounce::tileCoordForPosition(Vec2 CurrentPosition) {
 	CurrentPosition = Vec2(CurrentPosition.x*2, CurrentPosition.y*2);

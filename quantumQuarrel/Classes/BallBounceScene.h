@@ -41,8 +41,9 @@ public:
 	void setViewPointCenter(Vec2 position); // Centering the camera around the ball sprite
 	bool InAir(Vec2 position);
 	bool hitDeathPlane(Vec2 currentPosition);
-
+	void checkForCollision(Sprite* Attacker, Sprite* Reciver);
 	Sprite *ballSprite;
+	Sprite* testBall;
 	Vec2 position;
 	Vec2 velocity;
 	Vec2 acceleration;
