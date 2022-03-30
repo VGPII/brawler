@@ -6,11 +6,11 @@ class Player
 public:
 	//CREATE_FUNC(Player);
 
-	virtual bool init(int, TMXTiledMap*, Rect);
+	virtual bool init(int gravStrength, TMXTiledMap* initMap, Rect boundingBox);
 	void update(float);
-	void spawn(Vec2);
+	void spawn(Vec2 pos);
 	void jump();
-	void run(float);
+	void run(float vel);
 	bool InAir(Vec2 position);
 	bool hitDeathPlane(Vec2 currentPosition);
 	Vec2 tileCoordForPosition(Vec2 position); // Converting pixel values to x,y coordinates on the tilemap

@@ -46,13 +46,22 @@ bool BallBounce::init()
 	_MainMap = TMXTiledMap::create("mainMap.tmx");
 	auto background = _MainMap->getLayer("Background");
 	_ground = _MainMap->getLayer("Collision");
+	_ground->setVisible(false);
 	_DeathPlane = _MainMap->getLayer("Death_Plane");
+	_DeathPlane->setVisible(false);
 	this->addChild(_MainMap);
 
 	playerOne = new Player();
-	playerOne->init(gravity, _MainMap, this->getBoundingBox());
-	this->addChild(playerOne->playerSprite);
+	playerTwo = new Player();
 
+	playerTwo->init(gravity, _MainMap, this->getBoundingBox());
+	playerOne->init(gravity, _MainMap, this->getBoundingBox());
+
+	playerTwo->playerSprite = Sprite::create("ball_blue.png");
+	playerTwo->position.x += 100;
+
+	this->addChild(playerOne->playerSprite);
+	this->addChild(playerTwo->playerSprite);
 
 	this->scheduleUpdate();
 
@@ -60,8 +69,12 @@ bool BallBounce::init()
 }
 
 void BallBounce::update(float dt) {
-	playerOne->update(dt);
+	CCLOG("Player Position %f", playerOne->position.x);
+	CCLOG("Enemy Position %f", playerTwo->position.x);
 
+	playerOne->update(dt);
+	playerTwo->update(dt);
+	checkForCollision(playerOne->position, playerTwo->position);
 }
 
 void BallBounce::setViewPointCenter(Vec2 Position) {
@@ -78,4 +91,15 @@ void BallBounce::setViewPointCenter(Vec2 Position) {
 	viewPoint.subtract(actualposition);
 
 	this->setPosition(viewPoint);
+}
+
+void BallBounce::checkForCollision(Vec2 AttackerPos, Vec2 ReciverPos) {
+	if (AttackerPos.x == ReciverPos.x || abs(AttackerPos.x - ReciverPos.x) < 10) {// Change this value to be the radius of the sprite
+		if (AttackerPos.y == ReciverPos.y || abs(AttackerPos.y - ReciverPos.y) < 10) {
+			CCLOG("Collison");
+			//Insert momentum calculations here
+		}
+	}
+
+
 }

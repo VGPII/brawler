@@ -62,12 +62,12 @@ bool MainMenu::init() {
 
 	Start1 = Sprite::create("menuAssets/start_1.png");
 	Start1->setPosition(winSize.width / 2, winSize.height*(0.7));
-	Start1->setVisible(true);
+	Start1->setVisible(false);
 	this->addChild(Start1);
 
 	Start2 = Sprite::create("menuAssets/start_2.png");
 	Start2->setPosition(winSize.width / 2, winSize.height*(0.7));
-	Start2->setVisible(false);
+	Start2->setVisible(true);
 	this->addChild(Start2);
 
 	Options1 = Sprite::create("menuAssets/options_1.png");

@@ -135,6 +135,12 @@ void Player::update(float dt) {
 				canJump = false;
 			}
 		}
+		if (buttons[B] == GLFW_PRESS) {
+			if (canJump) {
+				acceleration.x = 0;
+				velocity.x *= .8;
+			}
+		}
 	}
 	if (onGround) {
 		if (velocity.y < 0) {
