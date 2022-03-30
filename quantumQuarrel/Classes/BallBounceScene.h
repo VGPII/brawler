@@ -26,6 +26,7 @@
 #define __BALLBOUNCE_SCENE_H__
 
 #include "cocos2d.h"
+#include "Player.h"
 using namespace cocos2d;
 class BallBounce : public cocos2d::Scene
 {
@@ -42,20 +43,15 @@ public:
 	bool InAir(Vec2 position);
 	bool hitDeathPlane(Vec2 currentPosition);
 
-	Sprite *ballSprite;
-	Vec2 position;
-	Vec2 velocity;
-	Vec2 acceleration;
-	Vec2 gravity;
-	Vec2 SpawnpointP1;
+	int gravity;
 
 	TMXTiledMap* _MainMap;
 	TMXLayer* _background;
 	TMXLayer* _ground;
 	TMXLayer* _DeathPlane;
-	TMXObjectGroup* objectGroup;
 	ValueMap* playerSpawnPoint;
-
+	
+	Player* playerOne;
 
 	bool canJump;
 	bool onGround;
