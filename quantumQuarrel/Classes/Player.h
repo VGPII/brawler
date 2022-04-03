@@ -6,19 +6,25 @@ class Player
 public:
 	//CREATE_FUNC(Player);
 
-	virtual bool init(int gravStrength, TMXTiledMap* initMap, Rect boundingBox);
+	virtual bool init(int gravStrength, TMXTiledMap* initMap, Rect boundingBox, int playerNumber);
 	void update(float);
 	void spawn(Vec2 pos);
 	void jump();
 	void run(float vel);
 	bool InAir(Vec2 position);
 	bool hitDeathPlane(Vec2 currentPosition);
+	void updateStunStatus();
+	bool isStuned;
+	bool isAttacking;
+	bool Attacked();
+	void setHitBox(Rect);
 	Vec2 tileCoordForPosition(Vec2 position); // Converting pixel values to x,y coordinates on the tilemap
 	Rect boundingBox;
 	TMXLayer* _background;
 	TMXLayer* _ground;
 	TMXLayer* _DeathPlane;
 	TMXObjectGroup* objectGroup;
+	Rect hitBox;
 
 	TMXTiledMap* _CurMap;
 	Sprite *playerSprite;
@@ -26,8 +32,8 @@ public:
 	Vec2 velocity;
 	Vec2 acceleration;
 	Vec2 gravity;
-	Vec2 SpawnpointP1;
-
+	Vec2 Spawnpoint;
+	int playerNumber;
 	bool canJump;
 	bool onGround;
 	float maxVel = 500;

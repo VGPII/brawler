@@ -54,11 +54,12 @@ bool BallBounce::init()
 	playerOne = new Player();
 	playerTwo = new Player();
 
-	playerTwo->init(gravity, _MainMap, this->getBoundingBox());
-	playerOne->init(gravity, _MainMap, this->getBoundingBox());
+	playerOne->init(gravity, _MainMap, this->getBoundingBox(), 1);
+	playerTwo->init(gravity, _MainMap, this->getBoundingBox(), 2);
+	
 
 	playerTwo->playerSprite = Sprite::create("ball_blue.png");
-	playerTwo->position.x += 100;
+	
 
 	this->addChild(playerOne->playerSprite);
 	this->addChild(playerTwo->playerSprite);
@@ -69,12 +70,19 @@ bool BallBounce::init()
 }
 
 void BallBounce::update(float dt) {
-	CCLOG("Player Position %f", playerOne->position.x);
-	CCLOG("Enemy Position %f", playerTwo->position.x);
+	CCLOG("Player Position %f", playerOne->position.y);
+	CCLOG("Enemy Position %f", playerTwo->position.y);
 
 	playerOne->update(dt);
 	playerTwo->update(dt);
-	checkForCollision(playerOne->position, playerTwo->position);
+	if (playerOne->Attacked()) {
+		playerOne->setHitBox(Rect(playerOne->position.x+2, playerOne->position.y, 5, 5));
+		checkForCollision(playerOne->hitBox, playerTwo->boundingBox);
+	}
+	else if (playerTwo->Attacked()) {
+		checkForCollision(playerTwo->hitBox, playerOne->boundingBox);
+	}
+	
 }
 
 void BallBounce::setViewPointCenter(Vec2 Position) {
@@ -93,13 +101,14 @@ void BallBounce::setViewPointCenter(Vec2 Position) {
 	this->setPosition(viewPoint);
 }
 
-void BallBounce::checkForCollision(Vec2 AttackerPos, Vec2 ReciverPos) {
-	if (AttackerPos.x == ReciverPos.x || abs(AttackerPos.x - ReciverPos.x) < 10) {// Change this value to be the radius of the sprite
-		if (AttackerPos.y == ReciverPos.y || abs(AttackerPos.y - ReciverPos.y) < 10) {
-			CCLOG("Collison");
-			//Insert momentum calculations here
-		}
+void BallBounce::checkForCollision(Rect Attacker, Rect Reciver) {
+	if (Attacker.intersectsRect(Reciver)) {
+		CCLOG("Collison");
 	}
-
-
+	/*if (abs(Attacker->getPosition().x - Reciver->getPosition().x) < 10) {// Change this value to be the radius of the sprite
+		if (abs(Attacker->getPosition().y - Reciver->getPosition().y) < 10) {
+			
+		//Insert momentum calculations here
+		}
+	}*/
 }

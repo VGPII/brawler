@@ -42,7 +42,7 @@ public:
 	void setViewPointCenter(Vec2 position); // Centering the camera around the ball sprite
 	bool InAir(Vec2 position);
 	bool hitDeathPlane(Vec2 currentPosition);
-	void checkForCollision(Vec2 Attacker, Vec2 Reciver);
+	void checkForCollision(Rect Attacker, Rect Reciver);
 
 	int gravity;
 

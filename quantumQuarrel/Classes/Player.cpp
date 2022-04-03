@@ -24,7 +24,9 @@ USING_NS_CC;
 #define DN 12
 #define LF 13
 
-bool Player::init(int gravStrength, TMXTiledMap* initMap, Rect initBoundingBox)
+
+
+bool Player::init(int gravStrength, TMXTiledMap* initMap, Rect initBoundingBox, int playerNumberInit)
 {
 	boundingBox = initBoundingBox;
 	playerSprite = Sprite::create("ball.png");
@@ -33,27 +35,39 @@ bool Player::init(int gravStrength, TMXTiledMap* initMap, Rect initBoundingBox)
 	_ground = _CurMap->getLayer("Collision");
 	_DeathPlane = _CurMap->getLayer("Death_Plane");
 	objectGroup = _CurMap->getObjectGroup("SpawnPoints");
-
+	playerNumber = playerNumberInit;
 
 	if (objectGroup == NULL) {
 		CCLOG("Tile map does not have an object layer");
 	}
-	ValueMap spawnPoint = objectGroup->getObject("SpawnPointP1");
-	SpawnpointP1 = Vec2(spawnPoint.at("x").asInt(), spawnPoint.at("y").asInt());
-
-	position = SpawnpointP1;
+	
+	if (playerNumber == 1) {
+		ValueMap spawnPoint = objectGroup->getObject("SpawnPointP1");
+		Spawnpoint = Vec2(spawnPoint.at("x").asInt(), spawnPoint.at("y").asInt());
+	}
+	if (playerNumber == 2) {
+		ValueMap spawnPoint = objectGroup->getObject("SpawnPointP2");
+		Spawnpoint = Vec2(spawnPoint.at("x").asInt(), spawnPoint.at("y").asInt());
+	}
+	
+	position = Spawnpoint;
 	velocity = cocos2d::Vec2(0, 0);
 	acceleration = cocos2d::Vec2(0, 0);
 	gravity = cocos2d::Vec2(0, -gravStrength);
 	radius = playerSprite->getBoundingBox().size.width / 2;
 	canJump = true;
 
+	hitBox = Rect(position.x, position.y, 5, 5);
+	isStuned = false;
+	isAttacking = false;
+
 	return true;
 }
 
 void Player::update(float dt) {
+	isAttacking = false;
 	if (hitDeathPlane(position)) {
-		position = SpawnpointP1;
+		position = Spawnpoint;
 		playerSprite->setPosition(position);
 		velocity = Vec2(0, 0);
 		acceleration = Vec2(0, 0);
@@ -87,11 +101,17 @@ void Player::update(float dt) {
 	else {
 		onGround = true;
 	}
+	int presentP1 = 0;
+	int presentP2 = 0;
 
-
-
-	int present = glfwJoystickPresent(GLFW_JOYSTICK_1);
-	if (present == 1) {
+	if (playerNumber == 1) {
+		presentP1 = glfwJoystickPresent(GLFW_JOYSTICK_1);
+	}
+	else if (playerNumber == 2) {
+		presentP2 = glfwJoystickPresent(GLFW_JOYSTICK_2);
+	}
+	
+	if (presentP1 == 1) {
 		int axesCount;
 		const float *axes = glfwGetJoystickAxes(GLFW_JOYSTICK_1, &axesCount);
 		int buttonCount;
@@ -141,6 +161,63 @@ void Player::update(float dt) {
 				velocity.x *= .8;
 			}
 		}
+		if (buttons[Y] == GLFW_PRESS) {
+			isAttacking = true;
+		}
+	}
+	if (presentP2) {
+		int axesCount;
+		const float* axes = glfwGetJoystickAxes(GLFW_JOYSTICK_2, &axesCount);
+		int buttonCount;
+		const unsigned char* buttons = glfwGetJoystickButtons(GLFW_JOYSTICK_2, &buttonCount);
+		const char* name = glfwGetJoystickName(GLFW_JOYSTICK_2);
+		/*
+		CCLOG("Axes Count: %d", axesCount);
+		CCLOG("Left Stick Hori: %.2f", axes[0]);
+		CCLOG("Left Stick Vert: %.2f", axes[1]);
+		CCLOG("Right Stick Hori: %.2f", axes[2]);
+		CCLOG("Right Stick Vert: %.2f", axes[3]);
+		CCLOG("Left Trigger: %.2f", axes[4]);
+		CCLOG("Right Trigger: %.2f", axes[5]);
+
+		CCLOG("Button Count: %d", buttonCount);
+		CCLOG("A: %d", buttons[0] == GLFW_PRESS);
+		CCLOG("B: %d", buttons[1] == GLFW_PRESS);
+		CCLOG("X: %d", buttons[2] == GLFW_PRESS);
+		CCLOG("Y: %d", buttons[3] == GLFW_PRESS);
+		CCLOG("LB: %d", buttons[4] == GLFW_PRESS);
+		CCLOG("RB: %d", buttons[5] == GLFW_PRESS);
+		CCLOG("Select: %d", buttons[6] == GLFW_PRESS);
+		CCLOG("Start: %d", buttons[7] == GLFW_PRESS);
+		CCLOG("LS: %d", buttons[8] == GLFW_PRESS);
+		CCLOG("RS: %d", buttons[9] == GLFW_PRESS);
+		CCLOG("UP: %d", buttons[10] == GLFW_PRESS);
+		CCLOG("RT: %d", buttons[11] == GLFW_PRESS);
+		CCLOG("DN: %d", buttons[12] == GLFW_PRESS);
+		CCLOG("LF: %d", buttons[13] == GLFW_PRESS);
+		*/
+
+		if (axes[LS_HORI] > .15) {
+			acceleration.x = 3 * axes[0];
+		}
+		if (axes[LS_HORI] < -.15) {
+			acceleration.x = 3 * axes[0];
+		}
+		if (buttons[A] == GLFW_PRESS) {
+			if (canJump) {
+				acceleration.y += 200;
+				canJump = false;
+			}
+		}
+		if (buttons[B] == GLFW_PRESS) {
+			if (canJump) {
+				acceleration.x = 0;
+				velocity.x *= .8;
+			}
+		}
+		if (buttons[Y] == GLFW_PRESS) {
+			isAttacking = true;
+		}
 	}
 	if (onGround) {
 		if (velocity.y < 0) {
@@ -158,6 +235,7 @@ void Player::update(float dt) {
 	
 	playerSprite->setPosition(position);
 }
+
 
 bool Player::hitDeathPlane(Vec2 currentPosition) {
 	Vec2 tileCoord = tileCoordForPosition(currentPosition);
@@ -194,6 +272,23 @@ bool Player::InAir(Vec2 Currentposition) {
 	}
 
 	return true;
+}
+void Player::setHitBox(Rect newBox) {
+	hitBox = newBox;
+}
+
+
+void Player::updateStunStatus() {
+	if (!isStuned) {
+		isStuned= true;
+	}
+	else {
+		isStuned = false;
+	}
+	
+}
+bool Player::Attacked() {
+	return isAttacking;
 }
 
 Vec2 Player::tileCoordForPosition(Vec2 CurrentPosition) {

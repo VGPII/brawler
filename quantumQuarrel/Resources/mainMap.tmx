@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.8" tiledversion="1.8.2" orientation="orthogonal" renderorder="right-down" width="50" height="50" tilewidth="32" tileheight="32" infinite="0" nextlayerid="9" nextobjectid="9">
+<map version="1.8" tiledversion="1.8.2" orientation="orthogonal" renderorder="right-down" width="50" height="50" tilewidth="32" tileheight="32" infinite="0" nextlayerid="9" nextobjectid="14">
  <tileset firstgid="1" source="Background.tsx"/>
  <tileset firstgid="1981" source="frogatto-generic-bricks.tsx"/>
  <tileset firstgid="1993" source="meta_tiles.tsx"/>
@@ -31,5 +31,7 @@
  </layer>
  <objectgroup id="3" name="SpawnPoints">
   <object id="6" name="SpawnPointP1" x="296" y="934" width="23" height="24"/>
+  <object id="12" name="SpawnPointP2" x="1160" y="938" width="32" height="24"/>
+  <object id="13" x="1754" y="610"/>
  </objectgroup>
 </map>
