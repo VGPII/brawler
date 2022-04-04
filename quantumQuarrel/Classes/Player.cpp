@@ -34,6 +34,7 @@ bool Player::init(int gravStrength, TMXTiledMap* initMap, Rect initBoundingBox, 
 	_background = _CurMap->getLayer("Background");
 	_ground = _CurMap->getLayer("Collision");
 	_DeathPlane = _CurMap->getLayer("Death_Plane");
+
 	objectGroup = _CurMap->getObjectGroup("SpawnPoints");
 	playerNumber = playerNumberInit;
 
@@ -50,6 +51,8 @@ bool Player::init(int gravStrength, TMXTiledMap* initMap, Rect initBoundingBox, 
 		Spawnpoint = Vec2(spawnPoint.at("x").asInt(), spawnPoint.at("y").asInt());
 	}
 	
+	
+
 	position = Spawnpoint;
 	velocity = cocos2d::Vec2(0, 0);
 	acceleration = cocos2d::Vec2(0, 0);
@@ -231,8 +234,9 @@ void Player::update(float dt) {
 		velocity += acceleration + gravity * dt;
 	}
 
+	setHitBox(Rect(position.x - radius, position.y - radius, 2*radius, 2*radius));
+
 	position += velocity * dt;
-	
 	playerSprite->setPosition(position);
 }
 
@@ -241,20 +245,17 @@ bool Player::hitDeathPlane(Vec2 currentPosition) {
 	Vec2 tileCoord = tileCoordForPosition(currentPosition);
 	int tileGid = _DeathPlane->getTileGIDAt(tileCoord);
 	if (tileGid) {
-		//ValueMap properties = _MainMap->getPropertiesForGID(tileGid).asValueMap();
-		//if (properties.size() > 0) {
-		//	std::string plane;
-
-			//plane = properties.at("Collidable").asString();
-			//CCLOG("Props %S",properties.at("Death_Plane"));
-			//if (plane.compare("True")) {
-		return true;
+		ValueMap properties = _CurMap->getPropertiesForGID(tileGid).asValueMap();
+		if (properties.size() > 0) {
+			auto collisionTest = properties.at("Collidable");
+			std::string collision;
+			collision = properties.at("Collidable").asString();
+			if (collision.compare("True")) {
+				return true;
+			}
+		}
 	}
-	//}
-//}
-
 	return false;
-
 }
 
 bool Player::InAir(Vec2 Currentposition) {

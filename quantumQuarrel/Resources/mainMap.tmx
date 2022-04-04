@@ -26,7 +26,7 @@
    <property name="Collidable" type="bool" value="true"/>
   </properties>
   <data encoding="base64" compression="zlib">
-   eJztz0ENACAQwLD74d8WqjCAgBHaZAK218yW9EUv8tHio8VHi48WHy0+Wny0+Gjx0eKjxUeLjxYfLT5afLT4aPHR4qPFR8vtQ5LqHeKGYFg=
+   eJztzzENADAMwLB+4w+rrEZhZ6TZUgBkz8xK+qo6Hy0+Wny0+Gjx0eKjxUeLjxYfLT5afLT4aPHR4qPFR4uPFh8tPlp8tLx+SFK1C2NB+98=
   </data>
  </layer>
  <objectgroup id="3" name="SpawnPoints">
