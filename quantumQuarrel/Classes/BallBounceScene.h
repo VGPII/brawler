@@ -51,7 +51,9 @@ public:
 	TMXLayer* _ground;
 	TMXLayer* _DeathPlane;
 	ValueMap* playerSpawnPoint;
-	
+	DrawNode *node;
+	Size winSize;
+
 	Player* playerOne;
 	Player* playerTwo;
 
@@ -60,7 +62,8 @@ public:
 	float maxVel = 500;
 	float radius;
 
-
+	bool debugMode = false;
+	void drawBox(DrawNode* node, Vec2 bottomLeft, Vec2 topRight);
 };
 
 #endif // __BALLBOUNCE_SCENE_H__

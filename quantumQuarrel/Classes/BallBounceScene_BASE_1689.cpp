@@ -40,12 +40,6 @@ bool BallBounce::init()
 	{
 		return false;
 	}
-	
-	//debugMode = true; //Comment out to remove debugLines
-
-	winSize = cocos2d::Director::getInstance()->getWinSize();
-	node = DrawNode::create(2);
-
 
 	gravity = 400;
 
@@ -55,7 +49,6 @@ bool BallBounce::init()
 	_ground->setVisible(false);
 	_DeathPlane = _MainMap->getLayer("Death_Plane");
 	_DeathPlane->setVisible(false);
-
 	this->addChild(_MainMap);
 
 	playerOne = new Player();
@@ -72,7 +65,6 @@ bool BallBounce::init()
 	this->addChild(playerTwo->playerSprite);
 
 	this->scheduleUpdate();
-	this->addChild(node);
 
 	return true;
 }
@@ -84,55 +76,13 @@ void BallBounce::update(float dt) {
 	playerOne->update(dt);
 	playerTwo->update(dt);
 	if (playerOne->Attacked()) {
-<<<<<<< HEAD
-		if (playerOne->orientation == 1) {
-			playerOne->setHitBox(Rect(playerOne->position.x + 4, playerOne->position.y, 10, 10));
-		}
-		else {
-			playerOne->setHitBox(Rect(playerOne->position.x - 4, playerOne->position.y, 10, 10));
-		}
-		if (checkForCollision(playerOne->hitBox, playerTwo->boundingBox)) {
-			//Play knockback animation
-			calculateKnockback(playerTwo, playerOne->orientation);
-		}
+		playerOne->setHitBox(Rect(playerOne->position.x+2, playerOne->position.y, 5, 5));
+		checkForCollision(playerOne->hitBox, playerTwo->boundingBox);
 	}
 	else if (playerTwo->Attacked()) {
-		if (playerTwo->orientation == 1) {
-			playerTwo->setHitBox(Rect(playerTwo->position.x + 4, playerTwo->position.y, 10, 10));
-		}
-		else {
-			playerTwo->setHitBox(Rect(playerTwo->position.x - 4, playerTwo->position.y, 10, 10));
-		}
-		if (checkForCollision(playerTwo->hitBox, playerOne->boundingBox)) {
-			//Play knockback animation
-			calculateKnockback(playerOne, playerTwo->orientation);
-		}
-=======
-		checkForCollision(playerOne->hitBox, playerTwo->hitBox);
-	}
-	else if (playerTwo->Attacked()) {
-		checkForCollision(playerTwo->hitBox, playerOne->hitBox);
->>>>>>> 5f8a4ff4a81a24ad71cad783266a0c0098829e86
+		checkForCollision(playerTwo->hitBox, playerOne->boundingBox);
 	}
 	
-	// For debugging purposes
-	if (debugMode) {
-		node->clear();
-		//players
-		drawBox(node, Vec2(playerOne->position.x - playerOne->radius, playerOne->position.y - playerOne->radius), Vec2(playerOne->position.x + playerOne->radius, playerOne->position.y + playerOne->radius));
-		drawBox(node, Vec2(playerTwo->position.x - playerTwo->radius, playerTwo->position.y - playerTwo->radius), Vec2(playerTwo->position.x + playerTwo->radius, playerTwo->position.y + playerTwo->radius));
-		//deathplane
-		auto winWidth = _MainMap->getMapSize().width;
-		auto winHeight = _MainMap->getMapSize().height;
-		for (int tileY = 0; tileY < winHeight; tileY++) {
-			for (int tileX = 0; tileX < winWidth; tileX++) {
-				auto xPos = tileX * 16;//_MainMap->getTileSize().width;
-				auto yPos = tileY * 16;//_MainMap->getTileSize().height;
-				node->drawPoint(Vec2(xPos, yPos), 3, Color4F::RED);
-				drawBox(node, Vec2(xPos, yPos), Vec2(xPos + _MainMap->getTileSize().width, yPos + _MainMap->getTileSize().height));
-			}
-		}
-	}
 }
 
 void BallBounce::setViewPointCenter(Vec2 Position) {
@@ -151,12 +101,10 @@ void BallBounce::setViewPointCenter(Vec2 Position) {
 	this->setPosition(viewPoint);
 }
 
-bool BallBounce::checkForCollision(Rect Attacker, Rect Reciver) {
+void BallBounce::checkForCollision(Rect Attacker, Rect Reciver) {
 	if (Attacker.intersectsRect(Reciver)) {
 		CCLOG("Collison");
-		return true;
 	}
-	return false;
 	/*if (abs(Attacker->getPosition().x - Reciver->getPosition().x) < 10) {// Change this value to be the radius of the sprite
 		if (abs(Attacker->getPosition().y - Reciver->getPosition().y) < 10) {
 			
@@ -164,17 +112,3 @@ bool BallBounce::checkForCollision(Rect Attacker, Rect Reciver) {
 		}
 	}*/
 }
-<<<<<<< HEAD
-void BallBounce::calculateKnockback(Player* Reciver, int AttackOrientation) {
-	Reciver->acceleration.x+= 20 * AttackOrientation;
-	Reciver->acceleration.y+= 50 * AttackOrientation;
-}
-=======
-
-void BallBounce::drawBox(DrawNode* node, Vec2 bottomLeft, Vec2 topRight) {
-	float height = topRight.y - bottomLeft.y;
-	node->drawLine(Vec2(bottomLeft.x, bottomLeft.y), Vec2(topRight.x, topRight.y), Color4F::RED);
-	node->drawLine(Vec2(bottomLeft.x, bottomLeft.y + height), Vec2(topRight.x, topRight.y - height), Color4F::RED);
-	node->drawRect(Vec2(bottomLeft.x, bottomLeft.y), Vec2(topRight.x, topRight.y), Color4F::RED);
-}
->>>>>>> 5f8a4ff4a81a24ad71cad783266a0c0098829e86
