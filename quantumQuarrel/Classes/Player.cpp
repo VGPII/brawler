@@ -249,12 +249,12 @@ bool Player::hitDeathPlane(Vec2 currentPosition) {
 	if (tileGid) {
 		ValueMap properties = _CurMap->getPropertiesForGID(tileGid).asValueMap();
 		if (properties.size() > 0) {
-			auto collisionTest = properties.at("Collidable");
-			std::string collision;
-			collision = properties.at("Collidable").asString();
-			if (collision.compare("True")) {
+		//	auto collisionTest = properties.at("Collidable");
+			//std::string collision;
+			//collision = properties.at("Collidable").asString();
+			//if (collision.compare("True")) {
 				return true;
-			}
+		//	}
 		}
 	}
 	return false;
@@ -266,11 +266,11 @@ bool Player::InAir(Vec2 Currentposition) {
 	if (tileGid) {
 		ValueMap properties = _CurMap->getPropertiesForGID(tileGid).asValueMap();
 		if (properties.size() > 0) {
-			std::string collision;
-			collision = properties.at("Collidable").asString();
-			if (collision.compare("True")) {
+			//std::string collision;
+			//collision = properties.at("Collidable").asString();
+			//if (collision.compare("True")) {
 				return false;
-			}
+			//}
 		}
 	}
 

@@ -84,7 +84,6 @@ void BallBounce::update(float dt) {
 	playerOne->update(dt);
 	playerTwo->update(dt);
 	if (playerOne->Attacked()) {
-<<<<<<< HEAD
 		if (playerOne->orientation == 1) {
 			playerOne->setHitBox(Rect(playerOne->position.x + 4, playerOne->position.y, 10, 10));
 		}
@@ -107,14 +106,7 @@ void BallBounce::update(float dt) {
 			//Play knockback animation
 			calculateKnockback(playerOne, playerTwo->orientation);
 		}
-=======
-		checkForCollision(playerOne->hitBox, playerTwo->hitBox);
 	}
-	else if (playerTwo->Attacked()) {
-		checkForCollision(playerTwo->hitBox, playerOne->hitBox);
->>>>>>> 5f8a4ff4a81a24ad71cad783266a0c0098829e86
-	}
-	
 	// For debugging purposes
 	if (debugMode) {
 		node->clear();
@@ -164,12 +156,10 @@ bool BallBounce::checkForCollision(Rect Attacker, Rect Reciver) {
 		}
 	}*/
 }
-<<<<<<< HEAD
 void BallBounce::calculateKnockback(Player* Reciver, int AttackOrientation) {
 	Reciver->acceleration.x+= 20 * AttackOrientation;
 	Reciver->acceleration.y+= 50 * AttackOrientation;
 }
-=======
 
 void BallBounce::drawBox(DrawNode* node, Vec2 bottomLeft, Vec2 topRight) {
 	float height = topRight.y - bottomLeft.y;
@@ -177,4 +167,3 @@ void BallBounce::drawBox(DrawNode* node, Vec2 bottomLeft, Vec2 topRight) {
 	node->drawLine(Vec2(bottomLeft.x, bottomLeft.y + height), Vec2(topRight.x, topRight.y - height), Color4F::RED);
 	node->drawRect(Vec2(bottomLeft.x, bottomLeft.y), Vec2(topRight.x, topRight.y), Color4F::RED);
 }
->>>>>>> 5f8a4ff4a81a24ad71cad783266a0c0098829e86
