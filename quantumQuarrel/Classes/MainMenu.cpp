@@ -121,7 +121,7 @@ void MainMenu::getControllerInput(float dt) {
         if (axes[1] > deadZone) {
             cursorPosition += 1;
         }
-        if (axes[1] < 0) {
+        if (axes[1] < deadZone*-1) {
             cursorPosition -= 1;
         }
         if (buttons[0] == 1) {

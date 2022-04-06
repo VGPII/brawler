@@ -40,9 +40,9 @@ public:
 	void update(float) override;
 	Vec2 tileCoordForPosition(Vec2 position); // Converting pixel values to x,y coordinates on the tilemap
 	void setViewPointCenter(Vec2 position); // Centering the camera around the ball sprite
-	bool InAir(Vec2 position);
-	bool hitDeathPlane(Vec2 currentPosition);
-	void checkForCollision(Rect Attacker, Rect Reciver);
+	
+	bool checkForCollision(Rect Attacker, Rect Reciver); // Checks for collision between the attacker's hit box, and the other player's bounding box
+	void calculateKnockback(Player* Reciver, int AttackOrientation); // Caclulates the knockback of the reciver based on the orientation of the attacker
 
 	int gravity;
 

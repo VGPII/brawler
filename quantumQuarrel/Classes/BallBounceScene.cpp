@@ -76,11 +76,28 @@ void BallBounce::update(float dt) {
 	playerOne->update(dt);
 	playerTwo->update(dt);
 	if (playerOne->Attacked()) {
-		playerOne->setHitBox(Rect(playerOne->position.x+2, playerOne->position.y, 5, 5));
-		checkForCollision(playerOne->hitBox, playerTwo->boundingBox);
+		if (playerOne->orientation == 1) {
+			playerOne->setHitBox(Rect(playerOne->position.x + 4, playerOne->position.y, 10, 10));
+		}
+		else {
+			playerOne->setHitBox(Rect(playerOne->position.x - 4, playerOne->position.y, 10, 10));
+		}
+		if (checkForCollision(playerOne->hitBox, playerTwo->boundingBox)) {
+			//Play knockback animation
+			calculateKnockback(playerTwo, playerOne->orientation);
+		}
 	}
 	else if (playerTwo->Attacked()) {
-		checkForCollision(playerTwo->hitBox, playerOne->boundingBox);
+		if (playerTwo->orientation == 1) {
+			playerTwo->setHitBox(Rect(playerTwo->position.x + 4, playerTwo->position.y, 10, 10));
+		}
+		else {
+			playerTwo->setHitBox(Rect(playerTwo->position.x - 4, playerTwo->position.y, 10, 10));
+		}
+		if (checkForCollision(playerTwo->hitBox, playerOne->boundingBox)) {
+			//Play knockback animation
+			calculateKnockback(playerOne, playerTwo->orientation);
+		}
 	}
 	
 }
@@ -101,14 +118,20 @@ void BallBounce::setViewPointCenter(Vec2 Position) {
 	this->setPosition(viewPoint);
 }
 
-void BallBounce::checkForCollision(Rect Attacker, Rect Reciver) {
+bool BallBounce::checkForCollision(Rect Attacker, Rect Reciver) {
 	if (Attacker.intersectsRect(Reciver)) {
 		CCLOG("Collison");
+		return true;
 	}
+	return false;
 	/*if (abs(Attacker->getPosition().x - Reciver->getPosition().x) < 10) {// Change this value to be the radius of the sprite
 		if (abs(Attacker->getPosition().y - Reciver->getPosition().y) < 10) {
 			
 		//Insert momentum calculations here
 		}
 	}*/
+}
+void BallBounce::calculateKnockback(Player* Reciver, int AttackOrientation) {
+	Reciver->acceleration.x+= 20 * AttackOrientation;
+	Reciver->acceleration.y+= 50 * AttackOrientation;
 }

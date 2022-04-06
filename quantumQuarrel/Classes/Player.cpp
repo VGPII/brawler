@@ -24,8 +24,6 @@ USING_NS_CC;
 #define DN 12
 #define LF 13
 
-
-
 bool Player::init(int gravStrength, TMXTiledMap* initMap, Rect initBoundingBox, int playerNumberInit)
 {
 	boundingBox = initBoundingBox;
@@ -44,10 +42,12 @@ bool Player::init(int gravStrength, TMXTiledMap* initMap, Rect initBoundingBox, 
 	if (playerNumber == 1) {
 		ValueMap spawnPoint = objectGroup->getObject("SpawnPointP1");
 		Spawnpoint = Vec2(spawnPoint.at("x").asInt(), spawnPoint.at("y").asInt());
+		orientation = 1;
 	}
-	if (playerNumber == 2) {
+	else if (playerNumber == 2) {
 		ValueMap spawnPoint = objectGroup->getObject("SpawnPointP2");
 		Spawnpoint = Vec2(spawnPoint.at("x").asInt(), spawnPoint.at("y").asInt());
+		orientation = -1;
 	}
 	
 	position = Spawnpoint;
@@ -142,12 +142,16 @@ void Player::update(float dt) {
 		CCLOG("DN: %d", buttons[12] == GLFW_PRESS);
 		CCLOG("LF: %d", buttons[13] == GLFW_PRESS);
 		*/
-
+		//Moving right
 		if (axes[LS_HORI] > .15) {
 			acceleration.x = 3 * axes[0];
+			orientation = 1;
 		}
+
+		//Moving Left
 		if (axes[LS_HORI] < -.15) {
 			acceleration.x = 3 * axes[0];
+			orientation = -1;
 		}
 		if (buttons[A] == GLFW_PRESS) {
 			if (canJump) {
@@ -235,8 +239,6 @@ void Player::update(float dt) {
 	
 	playerSprite->setPosition(position);
 }
-
-
 bool Player::hitDeathPlane(Vec2 currentPosition) {
 	Vec2 tileCoord = tileCoordForPosition(currentPosition);
 	int tileGid = _DeathPlane->getTileGIDAt(tileCoord);

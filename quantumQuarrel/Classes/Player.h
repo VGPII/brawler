@@ -34,6 +34,8 @@ public:
 	Vec2 gravity;
 	Vec2 Spawnpoint;
 	int playerNumber;
+	int playerLives;
+	int orientation; // Direction the player is facing: 1 is right, -1 is left
 	bool canJump;
 	bool onGround;
 	float maxVel = 500;
