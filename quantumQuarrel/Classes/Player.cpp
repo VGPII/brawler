@@ -42,12 +42,12 @@ bool Player::init(int gravStrength, TMXTiledMap* initMap, Rect initBoundingBox, 
 	
 	if (playerNumber == 1) {
 		ValueMap spawnPoint = objectGroup->getObject("SpawnPointP1");
-		Spawnpoint = Vec2(spawnPoint.at("x").asInt(), spawnPoint.at("y").asInt());
+		Spawnpoint = Vec2(spawnPoint.at("x").asInt() * _CurMap->getScaleX(), spawnPoint.at("y").asInt());
 		orientation = 1;
 	}
 	else if (playerNumber == 2) {
 		ValueMap spawnPoint = objectGroup->getObject("SpawnPointP2");
-		Spawnpoint = Vec2(spawnPoint.at("x").asInt(), spawnPoint.at("y").asInt());
+		Spawnpoint = Vec2(spawnPoint.at("x").asInt() * _CurMap->getScaleX(), spawnPoint.at("y").asInt());
 		orientation = -1;
 	}
 	
@@ -242,6 +242,7 @@ void Player::update(float dt) {
 
 	position += velocity * dt;
 	playerSprite->setPosition(position);
+	boundingBox.origin = position;
 }
 bool Player::hitDeathPlane(Vec2 currentPosition) {
 	Vec2 tileCoord = tileCoordForPosition(currentPosition);
@@ -296,7 +297,8 @@ bool Player::Attacked() {
 
 Vec2 Player::tileCoordForPosition(Vec2 CurrentPosition) {
 	CurrentPosition = Vec2(CurrentPosition.x * 2, CurrentPosition.y * 2);
-	int x = CurrentPosition.x / _CurMap->getTileSize().width;
-	int y = ((_CurMap->getMapSize().height * _CurMap->getTileSize().height) - CurrentPosition.y) / _CurMap->getTileSize().height;
+	CCLOG("%f", _CurMap->getScaleX());
+	int x = (CurrentPosition.x / (_CurMap->getTileSize().width))/ _CurMap->getScaleX();
+	int y = (((_CurMap->getMapSize().height * _CurMap->getTileSize().height) - CurrentPosition.y) / _CurMap->getTileSize().height);
 	return Vec2(x, y);
 }

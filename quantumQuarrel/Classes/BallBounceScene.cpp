@@ -55,6 +55,8 @@ bool BallBounce::init()
 	_ground->setVisible(false);
 	_DeathPlane = _MainMap->getLayer("Death_Plane");
 	_DeathPlane->setVisible(false);
+	_MainMap->setScaleX((winSize.width / _MainMap->getContentSize().width) * 1);
+	_MainMap->setScaleY((winSize.height / _MainMap->getContentSize().height) * 1);
 
 	this->addChild(_MainMap);
 
@@ -85,12 +87,14 @@ void BallBounce::update(float dt) {
 	playerTwo->update(dt);
 	if (playerOne->Attacked()) {
 		if (playerOne->orientation == 1) {
-			playerOne->setHitBox(Rect(playerOne->position.x + 4, playerOne->position.y, 10, 10));
+			playerOne->setHitBox(Rect(playerOne->position.x + 10, playerOne->position.y, 10, 10));
 		}
 		else {
-			playerOne->setHitBox(Rect(playerOne->position.x - 4, playerOne->position.y, 10, 10));
+			playerOne->setHitBox(Rect(playerOne->position.x - 10, playerOne->position.y, 10, 10));
 		}
 		if (checkForCollision(playerOne->hitBox, playerTwo->boundingBox)) {
+			playerTwo->boundingBox;
+			playerOne->hitBox;
 			//Play knockback animation
 			calculateKnockback(playerTwo, playerOne->orientation);
 		}
