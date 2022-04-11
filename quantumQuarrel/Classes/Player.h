@@ -18,6 +18,7 @@ public:
 	bool isAttacking;
 	bool Attacked();
 	void setHitBox(Rect);
+	void setAttackBox(Rect);
 	Vec2 tileCoordForPosition(Vec2 position); // Converting pixel values to x,y coordinates on the tilemap
 	Rect boundingBox;
 	TMXLayer* _background;
@@ -25,6 +26,7 @@ public:
 	TMXLayer* _DeathPlane;
 	TMXObjectGroup* objectGroup;
 	Rect hitBox;
+	Rect attackBox;
 
 	TMXTiledMap* _CurMap;
 	Sprite *playerSprite;

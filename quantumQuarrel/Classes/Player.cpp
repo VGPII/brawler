@@ -42,12 +42,12 @@ bool Player::init(int gravStrength, TMXTiledMap* initMap, Rect initBoundingBox, 
 	
 	if (playerNumber == 1) {
 		ValueMap spawnPoint = objectGroup->getObject("SpawnPointP1");
-		Spawnpoint = Vec2(spawnPoint.at("x").asInt() * _CurMap->getScaleX(), spawnPoint.at("y").asInt());
+		Spawnpoint = Vec2(spawnPoint.at("x").asInt() * _CurMap->getScaleX(), spawnPoint.at("y").asInt() * _CurMap->getScaleY());
 		orientation = 1;
 	}
 	else if (playerNumber == 2) {
 		ValueMap spawnPoint = objectGroup->getObject("SpawnPointP2");
-		Spawnpoint = Vec2(spawnPoint.at("x").asInt() * _CurMap->getScaleX(), spawnPoint.at("y").asInt());
+		Spawnpoint = Vec2(spawnPoint.at("x").asInt() * _CurMap->getScaleX(), spawnPoint.at("y").asInt() * _CurMap->getScaleY());
 		orientation = -1;
 	}
 	
@@ -60,7 +60,13 @@ bool Player::init(int gravStrength, TMXTiledMap* initMap, Rect initBoundingBox, 
 	radius = playerSprite->getBoundingBox().size.width / 2;
 	canJump = true;
 
-	hitBox = Rect(position.x, position.y, 5, 5);
+	setHitBox(Rect(position.x - radius, position.y - radius, 2 * radius, 2 * radius));
+	if (orientation == 1) {
+		attackBox = Rect(position.x + 10, position.y, 10, 10);
+	}
+	else if (orientation == -1) {
+		attackBox = Rect(position.x - 10, position.y, -10, 10);
+	}
 	isStuned = false;
 	isAttacking = false;
 
@@ -206,9 +212,11 @@ void Player::update(float dt) {
 
 		if (axes[LS_HORI] > .15) {
 			acceleration.x = 3 * axes[0];
+			orientation = 1;
 		}
 		if (axes[LS_HORI] < -.15) {
 			acceleration.x = 3 * axes[0];
+			orientation = -1;
 		}
 		if (buttons[A] == GLFW_PRESS) {
 			if (canJump) {
@@ -238,25 +246,17 @@ void Player::update(float dt) {
 		velocity += acceleration + gravity * dt;
 	}
 
+
 	setHitBox(Rect(position.x - radius, position.y - radius, 2*radius, 2*radius));
 
 	position += velocity * dt;
 	playerSprite->setPosition(position);
-	boundingBox.origin = position;
 }
 bool Player::hitDeathPlane(Vec2 currentPosition) {
 	Vec2 tileCoord = tileCoordForPosition(currentPosition);
 	int tileGid = _DeathPlane->getTileGIDAt(tileCoord);
 	if (tileGid) {
-		ValueMap properties = _CurMap->getPropertiesForGID(tileGid).asValueMap();
-		if (properties.size() > 0) {
-		//	auto collisionTest = properties.at("Collidable");
-			//std::string collision;
-			//collision = properties.at("Collidable").asString();
-			//if (collision.compare("True")) {
-				return true;
-		//	}
-		}
+		return true;
 	}
 	return false;
 }
@@ -265,14 +265,7 @@ bool Player::InAir(Vec2 Currentposition) {
 	Vec2 tileCoord = tileCoordForPosition(Currentposition);
 	int tileGid = _ground->getTileGIDAt(tileCoord);
 	if (tileGid) {
-		ValueMap properties = _CurMap->getPropertiesForGID(tileGid).asValueMap();
-		if (properties.size() > 0) {
-			//std::string collision;
-			//collision = properties.at("Collidable").asString();
-			//if (collision.compare("True")) {
-				return false;
-			//}
-		}
+		return false;
 	}
 
 	return true;
@@ -281,6 +274,9 @@ void Player::setHitBox(Rect newBox) {
 	hitBox = newBox;
 }
 
+void Player::setAttackBox(Rect newBox) {
+	attackBox = newBox;
+}
 
 void Player::updateStunStatus() {
 	if (!isStuned) {
@@ -296,9 +292,7 @@ bool Player::Attacked() {
 }
 
 Vec2 Player::tileCoordForPosition(Vec2 CurrentPosition) {
-	CurrentPosition = Vec2(CurrentPosition.x * 2, CurrentPosition.y * 2);
-	CCLOG("%f", _CurMap->getScaleX());
-	int x = (CurrentPosition.x / (_CurMap->getTileSize().width))/ _CurMap->getScaleX();
-	int y = (((_CurMap->getMapSize().height * _CurMap->getTileSize().height) - CurrentPosition.y) / _CurMap->getTileSize().height);
-	return Vec2(x, y);
+	int x = position.x / _CurMap->getTileSize().width; // tile x coord
+	int y = ((_CurMap->getMapSize().height * _CurMap->getTileSize().height) - position.y) / _CurMap->getTileSize().height; // tile y coord
+	return cocos2d::Vec2(x, y); // return tile coords
 }

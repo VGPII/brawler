@@ -85,32 +85,32 @@ void BallBounce::update(float dt) {
 
 	playerOne->update(dt);
 	playerTwo->update(dt);
+
 	if (playerOne->Attacked()) {
 		if (playerOne->orientation == 1) {
-			playerOne->setHitBox(Rect(playerOne->position.x + 10, playerOne->position.y, 10, 10));
+			playerOne->setAttackBox(Rect(playerOne->position.x + 10, playerOne->position.y, 10, 10));
 		}
 		else {
-			playerOne->setHitBox(Rect(playerOne->position.x - 10, playerOne->position.y, 10, 10));
+			playerOne->setAttackBox(Rect(playerOne->position.x - 10, playerOne->position.y, -10, 10));
 		}
-		if (checkForCollision(playerOne->hitBox, playerTwo->boundingBox)) {
-			playerTwo->boundingBox;
-			playerOne->hitBox;
+		if (checkForCollision(playerOne->attackBox, playerTwo->hitBox)) {
 			//Play knockback animation
-			calculateKnockback(playerTwo, playerOne->orientation);
+			calculateKnockback(playerTwo, playerOne);
 		}
 	}
-	else if (playerTwo->Attacked()) {
+	if (playerTwo->Attacked()) {
 		if (playerTwo->orientation == 1) {
-			playerTwo->setHitBox(Rect(playerTwo->position.x + 4, playerTwo->position.y, 10, 10));
+			playerTwo->setAttackBox(Rect(playerTwo->position.x + 10, playerTwo->position.y, 10, 10));
 		}
 		else {
-			playerTwo->setHitBox(Rect(playerTwo->position.x - 4, playerTwo->position.y, 10, 10));
+			playerTwo->setAttackBox(Rect(playerTwo->position.x - 10, playerTwo->position.y, -10, 10));
 		}
-		if (checkForCollision(playerTwo->hitBox, playerOne->boundingBox)) {
+		if (checkForCollision(playerTwo->attackBox, playerOne->hitBox)) {
 			//Play knockback animation
-			calculateKnockback(playerOne, playerTwo->orientation);
+			calculateKnockback(playerOne, playerTwo);
 		}
 	}
+
 	// For debugging purposes
 	if (debugMode) {
 		node->clear();
@@ -122,11 +122,23 @@ void BallBounce::update(float dt) {
 		auto winHeight = _MainMap->getMapSize().height;
 		for (int tileY = 0; tileY < winHeight; tileY++) {
 			for (int tileX = 0; tileX < winWidth; tileX++) {
-				auto xPos = tileX * 16;//_MainMap->getTileSize().width;
-				auto yPos = tileY * 16;//_MainMap->getTileSize().height;
-				node->drawPoint(Vec2(xPos, yPos), 3, Color4F::RED);
+				auto xPos = tileX * _MainMap->getTileSize().width;
+				auto yPos = tileY * _MainMap->getTileSize().height;
 				drawBox(node, Vec2(xPos, yPos), Vec2(xPos + _MainMap->getTileSize().width, yPos + _MainMap->getTileSize().height));
 			}
+		}
+		//hitboxes
+		if (playerOne->orientation == 1) {
+			drawBox(node, Rect(playerOne->position.x + 10, playerOne->position.y, 10, 10));
+		}
+		else {
+			drawBox(node, Rect(playerOne->position.x - 10, playerOne->position.y, -10, 10));
+		}
+		if (playerTwo->orientation == 1) {
+			drawBox(node, Rect(playerTwo->position.x + 10, playerTwo->position.y, 10, 10));
+		}
+		else {
+			drawBox(node, Rect(playerTwo->position.x - 10, playerTwo->position.y, -10, 10));
 		}
 	}
 }
@@ -153,19 +165,27 @@ bool BallBounce::checkForCollision(Rect Attacker, Rect Reciver) {
 		return true;
 	}
 	return false;
-	/*if (abs(Attacker->getPosition().x - Reciver->getPosition().x) < 10) {// Change this value to be the radius of the sprite
-		if (abs(Attacker->getPosition().y - Reciver->getPosition().y) < 10) {
-			
-		//Insert momentum calculations here
-		}
-	}*/
 }
-void BallBounce::calculateKnockback(Player* Reciver, int AttackOrientation) {
-	Reciver->acceleration.x+= 20 * AttackOrientation;
-	Reciver->acceleration.y+= 50 * AttackOrientation;
+void BallBounce::calculateKnockback(Player* Reciver, Player* Attacker) {
+	Reciver->acceleration.x+= (20 * Attacker->orientation);
+	if (Reciver->position.y >= Attacker->position.y) {
+		Reciver->acceleration.y += 50;
+	}
+	else {
+		Reciver->acceleration.y -= 50;
+	}
 }
 
 void BallBounce::drawBox(DrawNode* node, Vec2 bottomLeft, Vec2 topRight) {
+	float height = topRight.y - bottomLeft.y;
+	node->drawLine(Vec2(bottomLeft.x, bottomLeft.y), Vec2(topRight.x, topRight.y), Color4F::RED);
+	node->drawLine(Vec2(bottomLeft.x, bottomLeft.y + height), Vec2(topRight.x, topRight.y - height), Color4F::RED);
+	node->drawRect(Vec2(bottomLeft.x, bottomLeft.y), Vec2(topRight.x, topRight.y), Color4F::RED);
+}
+
+void BallBounce::drawBox(DrawNode* node, Rect rectangle) {
+	auto bottomLeft = Vec2(rectangle.getMinX(), rectangle.getMinY());
+	auto topRight = Vec2(rectangle.getMaxX(), rectangle.getMaxY());
 	float height = topRight.y - bottomLeft.y;
 	node->drawLine(Vec2(bottomLeft.x, bottomLeft.y), Vec2(topRight.x, topRight.y), Color4F::RED);
 	node->drawLine(Vec2(bottomLeft.x, bottomLeft.y + height), Vec2(topRight.x, topRight.y - height), Color4F::RED);

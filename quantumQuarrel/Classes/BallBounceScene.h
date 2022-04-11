@@ -42,7 +42,7 @@ public:
 	void setViewPointCenter(Vec2 position); // Centering the camera around the ball sprite
 	
 	bool checkForCollision(Rect Attacker, Rect Reciver); // Checks for collision between the attacker's hit box, and the other player's bounding box
-	void calculateKnockback(Player* Reciver, int AttackOrientation); // Caclulates the knockback of the reciver based on the orientation of the attacker
+	void calculateKnockback(Player* Reciver, Player* Attacker); // Caclulates the knockback of the reciver based on the orientation of the attacker
 
 	int gravity;
 
@@ -64,6 +64,8 @@ public:
 
 	bool debugMode = false;
 	void drawBox(DrawNode* node, Vec2 bottomLeft, Vec2 topRight);
+	void drawBox(DrawNode* node, Rect rectangle);
 };
+
 
 #endif // __BALLBOUNCE_SCENE_H__
