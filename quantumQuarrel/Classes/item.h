@@ -1,3 +1,4 @@
+#pragma once
 /****************************************************************************
  Copyright (c) 2017-2018 Xiamen Yaji Software Co., Ltd.
 
@@ -22,49 +23,24 @@
  THE SOFTWARE.
  ****************************************************************************/
 
-#ifndef __BALLBOUNCE_SCENE_H__
-#define __BALLBOUNCE_SCENE_H__
+#ifndef __MAINMENU_H__
+#define __MAINMENU_H__
 
 #include "cocos2d.h"
-#include "Player.h"
+
 using namespace cocos2d;
-class BallBounce : public cocos2d::Scene
+
+class Item : public cocos2d::Scene
 {
 public:
-	static cocos2d::Scene* createScene();
-
 	virtual bool init();
-
-	CREATE_FUNC(BallBounce);
-
-	void update(float) override;
-	void setViewPointCenter(Vec2 position); // Centering the camera around the ball sprite
-	
-	bool checkForCollision(Rect Attacker, Rect Reciver); // Checks for collision between the attacker's hit box, and the other player's bounding box
-	void calculateKnockback(Player* Reciver, Player* Attacker); // Caclulates the knockback of the reciver based on the orientation of the attacker
-
-	int gravity;
-
-	TMXTiledMap* _MainMap;
-	TMXLayer* _background;
-	TMXLayer* _ground;
-	TMXLayer* _DeathPlane;
-	ValueMap* playerSpawnPoint;
-	DrawNode *node;
-	Size winSize;
-
-	Player* playerOne;
-	Player* playerTwo;
-
-	bool canJump;
-	bool onGround;
-	float maxVel = 500;
-	float radius;
-
-	bool debugMode = false;
-	void drawBox(DrawNode* node, Vec2 bottomLeft, Vec2 topRight);
-	void drawBox(DrawNode* node, Rect rectangle);
+	void update(float dt);
+	Sprite* itemSprite;
+	//Need an array of chars / strings that represent each item
+	char items[];
 };
 
+#endif // __MAINMENU__H__
 
-#endif // __BALLBOUNCE_SCENE_H__
+
+

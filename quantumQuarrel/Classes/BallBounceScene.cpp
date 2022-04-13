@@ -65,10 +65,6 @@ bool BallBounce::init()
 
 	playerOne->init(gravity, _MainMap, this->getBoundingBox(), 1);
 	playerTwo->init(gravity, _MainMap, this->getBoundingBox(), 2);
-	
-
-	playerTwo->playerSprite = Sprite::create("ball_blue.png");
-	
 
 	this->addChild(playerOne->playerSprite);
 	this->addChild(playerTwo->playerSprite);
@@ -85,7 +81,6 @@ void BallBounce::update(float dt) {
 
 	playerOne->update(dt);
 	playerTwo->update(dt);
-
 	if (playerOne->Attacked()) {
 		if (playerOne->orientation == 1) {
 			playerOne->setAttackBox(Rect(playerOne->position.x + 10, playerOne->position.y, 10, 10));
@@ -110,7 +105,6 @@ void BallBounce::update(float dt) {
 			calculateKnockback(playerOne, playerTwo);
 		}
 	}
-
 	// For debugging purposes
 	if (debugMode) {
 		node->clear();
@@ -128,6 +122,7 @@ void BallBounce::update(float dt) {
 			}
 		}
 		//hitboxes
+		
 		if (playerOne->orientation == 1) {
 			drawBox(node, Rect(playerOne->position.x + 10, playerOne->position.y, 10, 10));
 		}
@@ -167,7 +162,7 @@ bool BallBounce::checkForCollision(Rect Attacker, Rect Reciver) {
 	return false;
 }
 void BallBounce::calculateKnockback(Player* Reciver, Player* Attacker) {
-	Reciver->acceleration.x+= (20 * Attacker->orientation);
+	Reciver->acceleration.x += (20 * Attacker->orientation);
 	if (Reciver->position.y >= Attacker->position.y) {
 		Reciver->acceleration.y += 50;
 	}

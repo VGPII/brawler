@@ -81,7 +81,8 @@ bool MainMenu::init() {
 	this->addChild(Options2);
 
     this->scheduleUpdate();
-    schedule(CC_SCHEDULE_SELECTOR(MainMenu::getControllerInput), 0.1f, kRepeatForever, 0);
+
+    schedule(CC_SCHEDULE_SELECTOR(MainMenu::getControllerInput), 0.1f, kRepeatForever, 0); // get controller input every 0.1 seconds
 	return true;
 	
 }

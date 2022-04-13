@@ -23,15 +23,20 @@ USING_NS_CC;
 #define RT 11
 #define DN 12
 #define LF 13
-
+#define JUMP_TAG 3
+#define WALK_TAG 1
+#define IDLE_TAG 0
+#define NULL_TAG -1
 bool Player::init(int gravStrength, TMXTiledMap* initMap, Rect initBoundingBox, int playerNumberInit)
 {
 	boundingBox = initBoundingBox;
-	playerSprite = Sprite::create("ball.png");
 	_CurMap = initMap;
 	_background = _CurMap->getLayer("Background");
 	_ground = _CurMap->getLayer("Collision");
 	_DeathPlane = _CurMap->getLayer("Death_Plane");
+	NUM_IDLE_FRAMES = 1;
+	NUM_JUMP_FRAMES = 8;
+	NUM_WALK_FRAMES = 6;
 
 	objectGroup = _CurMap->getObjectGroup("SpawnPoints");
 	playerNumber = playerNumberInit;
@@ -42,13 +47,18 @@ bool Player::init(int gravStrength, TMXTiledMap* initMap, Rect initBoundingBox, 
 	
 	if (playerNumber == 1) {
 		ValueMap spawnPoint = objectGroup->getObject("SpawnPointP1");
-		Spawnpoint = Vec2(spawnPoint.at("x").asInt() * _CurMap->getScaleX(), spawnPoint.at("y").asInt() * _CurMap->getScaleY());
-		orientation = 1;
+		Spawnpoint = Vec2(spawnPoint.at("x").asInt() * _CurMap->getScaleX(), spawnPoint.at("y").asInt()* _CurMap->getScaleY());
+		orientation = 1; // Facing towards the right side of the screen
+		playerSprite = Sprite::create("ball.png");
+		//Will need a loop to instantiate all of the animation types
+		loadAnimations();
 	}
 	else if (playerNumber == 2) {
 		ValueMap spawnPoint = objectGroup->getObject("SpawnPointP2");
 		Spawnpoint = Vec2(spawnPoint.at("x").asInt() * _CurMap->getScaleX(), spawnPoint.at("y").asInt() * _CurMap->getScaleY());
-		orientation = -1;
+		orientation = -1; // Facing towards the left side of the screen
+		playerSprite = Sprite::create("ball_blue.png");
+
 	}
 	
 	
@@ -61,6 +71,7 @@ bool Player::init(int gravStrength, TMXTiledMap* initMap, Rect initBoundingBox, 
 	canJump = true;
 
 	setHitBox(Rect(position.x - radius, position.y - radius, 2 * radius, 2 * radius));
+
 	if (orientation == 1) {
 		attackBox = Rect(position.x + 10, position.y, 10, 10);
 	}
@@ -69,8 +80,51 @@ bool Player::init(int gravStrength, TMXTiledMap* initMap, Rect initBoundingBox, 
 	}
 	isStuned = false;
 	isAttacking = false;
+	//Setting number of animation frames
+	
 
 	return true;
+}
+void Player::loadAnimations() {
+	//TODO: Scale Image down
+	char str[100] = { 0 };
+	//Loading jumping animation
+	for (int i = 1; i <= NUM_JUMP_FRAMES; i++) {
+		sprintf(str, "/PlayerAnimation/Jump/jumping_animation_%i.png", i);
+		auto frame = SpriteFrame::create(str, Rect(position.x, position.y, 221, 572), false, Vec2(0, 300), Size(221, 572));
+
+		JumpAnimation.pushBack(frame);
+	}
+	auto tmpAnimation = Animation::createWithSpriteFrames(JumpAnimation, 0.12f);
+	jumpAnimate = Animate::create(tmpAnimation);
+	jumpAnimate->retain();
+	jumping = jumpAnimate;
+	
+	//Loading Walking animation
+	for (int i = 1; i <= NUM_WALK_FRAMES; i++) {
+		sprintf(str, "/PlayerAnimation/walk/Walking_animation_%i.png", i);
+		auto frame = SpriteFrame::create(str, Rect(position.x, position.y, 200, 609), false, Vec2(0, 300), Size(200, 609));
+		walkAnimation.pushBack(frame);
+	}
+	tmpAnimation = Animation::createWithSpriteFrames(walkAnimation, 0.09f);
+	walkAnimate = Animate::create(tmpAnimation);
+	walkAnimate->retain();
+	walking = walkAnimate;
+	
+	//Loading idle animation
+	//Will fully implement later
+	for (int i = 1; i <= NUM_IDLE_FRAMES; i++) {
+		sprintf(str, "ball.png", i);
+		auto frame = SpriteFrame::create(str, Rect(position.x, position.y, 32, 32), false, Vec2(0, 0), Size(32, 32));
+		idleAnimation.pushBack(frame);
+	}
+
+	tmpAnimation = Animation::createWithSpriteFrames(idleAnimation, 0.09f);
+	idleAnimate = Animate::create(tmpAnimation);
+	idleAnimate->retain();
+	idling = idleAnimate;
+	
+
 }
 
 void Player::update(float dt) {
@@ -109,6 +163,21 @@ void Player::update(float dt) {
 	}
 	else {
 		onGround = true;
+		//Temp statement 
+		if (playerNumber == 1) {
+			playerSprite->stopActionByTag(3);
+			jumping->setTag(NULL_TAG);
+			if (velocity.x ==0 && acceleration.x==0) {
+				playerSprite->stopActionByTag(1);
+				walking->setTag(NULL_TAG);
+				if (playerSprite->getActionByTag(0) == nullptr) {
+					idling->setTag(IDLE_TAG);
+					playerSprite->runAction(idling);
+					playerSprite->setScale(1);
+				}
+				
+			}
+		}
 	}
 	int presentP1 = 0;
 	int presentP2 = 0;
@@ -155,17 +224,35 @@ void Player::update(float dt) {
 		if (axes[LS_HORI] > .15) {
 			acceleration.x = 3 * axes[0];
 			orientation = 1;
+			if (playerSprite->getActionByTag(1) == nullptr) {
+				walking->setTag(WALK_TAG);
+				playerSprite->runAction(walking);
+				playerSprite->setScale(0.3);
+			}
 		}
 
 		//Moving Left
 		if (axes[LS_HORI] < -.15) {
 			acceleration.x = 3 * axes[0];
 			orientation = -1;
+			if (playerSprite->getActionByTag(1) == nullptr) {
+				walking->setTag(WALK_TAG);
+				playerSprite->runAction(walking);
+				playerSprite->setScaleX(-0.3);
+				playerSprite->setScaleY(0.3);
+			}
+			
 		}
 		if (buttons[A] == GLFW_PRESS) {
 			if (canJump) {
 				acceleration.y += 200;
 				canJump = false;
+				if (playerSprite->getActionByTag(3) == nullptr) {
+					jumping->setTag(JUMP_TAG);
+					playerSprite->runAction(jumping);
+					playerSprite->setScale(0.3);
+				}
+				
 			}
 		}
 		if (buttons[B] == GLFW_PRESS) {
@@ -211,12 +298,12 @@ void Player::update(float dt) {
 		*/
 
 		if (axes[LS_HORI] > .15) {
-			acceleration.x = 3 * axes[0];
 			orientation = 1;
+			acceleration.x = 3 * axes[0];
 		}
 		if (axes[LS_HORI] < -.15) {
-			acceleration.x = 3 * axes[0];
 			orientation = -1;
+			acceleration.x = 3 * axes[0];
 		}
 		if (buttons[A] == GLFW_PRESS) {
 			if (canJump) {
@@ -246,11 +333,11 @@ void Player::update(float dt) {
 		velocity += acceleration + gravity * dt;
 	}
 
-
 	setHitBox(Rect(position.x - radius, position.y - radius, 2*radius, 2*radius));
 
 	position += velocity * dt;
 	playerSprite->setPosition(position);
+	boundingBox.origin = position;
 }
 bool Player::hitDeathPlane(Vec2 currentPosition) {
 	Vec2 tileCoord = tileCoordForPosition(currentPosition);
@@ -273,10 +360,10 @@ bool Player::InAir(Vec2 Currentposition) {
 void Player::setHitBox(Rect newBox) {
 	hitBox = newBox;
 }
-
 void Player::setAttackBox(Rect newBox) {
 	attackBox = newBox;
 }
+
 
 void Player::updateStunStatus() {
 	if (!isStuned) {

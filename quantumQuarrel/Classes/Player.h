@@ -13,12 +13,22 @@ public:
 	void run(float vel);
 	bool InAir(Vec2 position);
 	bool hitDeathPlane(Vec2 currentPosition);
+	void loadAnimations();
 	void updateStunStatus();
 	bool isStuned;
 	bool isAttacking;
 	bool Attacked();
 	void setHitBox(Rect);
 	void setAttackBox(Rect);
+	Vector<SpriteFrame*> JumpAnimation;
+	Animate* jumpAnimate;
+	int NUM_JUMP_FRAMES;
+	Vector<SpriteFrame*> walkAnimation;
+	Animate* walkAnimate;
+	int NUM_WALK_FRAMES;
+	Vector<SpriteFrame*> idleAnimation;
+	Animate* idleAnimate;
+	int NUM_IDLE_FRAMES;
 	Vec2 tileCoordForPosition(Vec2 position); // Converting pixel values to x,y coordinates on the tilemap
 	Rect boundingBox;
 	TMXLayer* _background;
@@ -27,6 +37,9 @@ public:
 	TMXObjectGroup* objectGroup;
 	Rect hitBox;
 	Rect attackBox;
+	Action* walking; // tag =1
+	Action* jumping;// tag = 3
+	Action* idling;// tag = 0
 
 	TMXTiledMap* _CurMap;
 	Sprite *playerSprite;
