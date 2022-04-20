@@ -20,6 +20,11 @@ public:
 	bool Attacked();
 	void setHitBox(Rect);
 	void setAttackBox(Rect);
+	bool ComboChain(float dtF, float dtI);
+	int numTimesAttacked;
+	float comboStartTime;
+	bool beginComboChain;
+	bool endChain;
 	Vector<SpriteFrame*> JumpAnimation;
 	Animate* jumpAnimate;
 	int NUM_JUMP_FRAMES;
@@ -40,6 +45,11 @@ public:
 	Action* walking; // tag =1
 	Action* jumping;// tag = 3
 	Action* idling;// tag = 0
+	float damage;
+	float comboCooldown;
+	float comboCooldownTime;
+	bool onCooldown;
+    
 
 	TMXTiledMap* _CurMap;
 	Sprite *playerSprite;
@@ -53,6 +63,7 @@ public:
 	int orientation; // Direction the player is facing: 1 is right, -1 is left
 	bool canJump;
 	bool onGround;
+	bool attackButtonPressed;
 	float maxVel = 500;
 	float radius;
 

@@ -37,6 +37,12 @@ bool Player::init(int gravStrength, TMXTiledMap* initMap, Rect initBoundingBox, 
 	NUM_IDLE_FRAMES = 1;
 	NUM_JUMP_FRAMES = 8;
 	NUM_WALK_FRAMES = 6;
+	playerLives = 3;
+	damage = 0.0;
+	comboCooldownTime = 0.5;
+	comboCooldown = comboCooldownTime;
+	onCooldown = false;
+
 
 	objectGroup = _CurMap->getObjectGroup("SpawnPoints");
 	playerNumber = playerNumberInit;
@@ -50,6 +56,7 @@ bool Player::init(int gravStrength, TMXTiledMap* initMap, Rect initBoundingBox, 
 		Spawnpoint = Vec2(spawnPoint.at("x").asInt() * _CurMap->getScaleX(), spawnPoint.at("y").asInt()* _CurMap->getScaleY());
 		orientation = 1; // Facing towards the right side of the screen
 		playerSprite = Sprite::create("ball.png");
+		playerSprite->setVisible(true);
 		//Will need a loop to instantiate all of the animation types
 		loadAnimations();
 	}
@@ -80,6 +87,7 @@ bool Player::init(int gravStrength, TMXTiledMap* initMap, Rect initBoundingBox, 
 	}
 	isStuned = false;
 	isAttacking = false;
+	attackButtonPressed = false;
 	//Setting number of animation frames
 	
 
@@ -127,16 +135,26 @@ void Player::loadAnimations() {
 
 }
 
-void Player::update(float dt) {
+void Player::update(float dt) { // dt is in seconds
 	isAttacking = false;
+	if (isStuned) {
+		velocity = Vec2(0, 0);
+		acceleration = Vec2(0, 0);
+	}
 	if (hitDeathPlane(position)) {
 		position = Spawnpoint;
 		playerSprite->setPosition(position);
 		velocity = Vec2(0, 0);
 		acceleration = Vec2(0, 0);
 		canJump = true;
-
 		return;
+	}
+	if (onCooldown) {
+		comboCooldown -= dt*10;
+		if (comboCooldown <= 0) {
+			onCooldown = false;
+			comboCooldown = comboCooldownTime;
+		}
 	}
 	if (InAir(position)) {
 		onGround = false;
@@ -167,15 +185,15 @@ void Player::update(float dt) {
 		if (playerNumber == 1) {
 			playerSprite->stopActionByTag(3);
 			jumping->setTag(NULL_TAG);
-			if (velocity.x ==0 && acceleration.x==0) {
+			if (velocity.x == 0 && acceleration.x == 0) {
 				playerSprite->stopActionByTag(1);
 				walking->setTag(NULL_TAG);
-				if (playerSprite->getActionByTag(0) == nullptr) {
+				if (playerSprite->getActionByTag(IDLE_TAG) == nullptr) {
 					idling->setTag(IDLE_TAG);
-					playerSprite->runAction(idling);
+					//playerSprite->runAction(idling);
 					playerSprite->setScale(1);
 				}
-				
+
 			}
 		}
 	}
@@ -188,13 +206,14 @@ void Player::update(float dt) {
 	else if (playerNumber == 2) {
 		presentP2 = glfwJoystickPresent(GLFW_JOYSTICK_2);
 	}
-	
+
 	if (presentP1 == 1) {
+		if(!isStuned){
 		int axesCount;
-		const float *axes = glfwGetJoystickAxes(GLFW_JOYSTICK_1, &axesCount);
+		const float* axes = glfwGetJoystickAxes(GLFW_JOYSTICK_1, &axesCount);
 		int buttonCount;
-		const unsigned char *buttons = glfwGetJoystickButtons(GLFW_JOYSTICK_1, &buttonCount);
-		const char *name = glfwGetJoystickName(GLFW_JOYSTICK_1);
+		const unsigned char* buttons = glfwGetJoystickButtons(GLFW_JOYSTICK_1, &buttonCount);
+		const char* name = glfwGetJoystickName(GLFW_JOYSTICK_1);
 		/*
 		CCLOG("Axes Count: %d", axesCount);
 		CCLOG("Left Stick Hori: %.2f", axes[0]);
@@ -226,8 +245,8 @@ void Player::update(float dt) {
 			orientation = 1;
 			if (playerSprite->getActionByTag(1) == nullptr) {
 				walking->setTag(WALK_TAG);
-				playerSprite->runAction(walking);
-				playerSprite->setScale(0.3);
+				//playerSprite->runAction(walking);
+				//playerSprite->setScale(0.3);
 			}
 		}
 
@@ -237,11 +256,11 @@ void Player::update(float dt) {
 			orientation = -1;
 			if (playerSprite->getActionByTag(1) == nullptr) {
 				walking->setTag(WALK_TAG);
-				playerSprite->runAction(walking);
-				playerSprite->setScaleX(-0.3);
-				playerSprite->setScaleY(0.3);
+				//playerSprite->runAction(walking);
+				//playerSprite->setScaleX(-0.3);
+				//playerSprite->setScaleY(0.3);
 			}
-			
+
 		}
 		if (buttons[A] == GLFW_PRESS) {
 			if (canJump) {
@@ -249,10 +268,10 @@ void Player::update(float dt) {
 				canJump = false;
 				if (playerSprite->getActionByTag(3) == nullptr) {
 					jumping->setTag(JUMP_TAG);
-					playerSprite->runAction(jumping);
-					playerSprite->setScale(0.3);
+					//playerSprite->runAction(jumping);
+					//playerSprite->setScale(0.3);
 				}
-				
+
 			}
 		}
 		if (buttons[B] == GLFW_PRESS) {
@@ -263,88 +282,110 @@ void Player::update(float dt) {
 		}
 		if (buttons[Y] == GLFW_PRESS) {
 			isAttacking = true;
+			attackButtonPressed = true;
 		}
 	}
+}
 	if (presentP2) {
-		int axesCount;
-		const float* axes = glfwGetJoystickAxes(GLFW_JOYSTICK_2, &axesCount);
-		int buttonCount;
-		const unsigned char* buttons = glfwGetJoystickButtons(GLFW_JOYSTICK_2, &buttonCount);
-		const char* name = glfwGetJoystickName(GLFW_JOYSTICK_2);
-		/*
-		CCLOG("Axes Count: %d", axesCount);
-		CCLOG("Left Stick Hori: %.2f", axes[0]);
-		CCLOG("Left Stick Vert: %.2f", axes[1]);
-		CCLOG("Right Stick Hori: %.2f", axes[2]);
-		CCLOG("Right Stick Vert: %.2f", axes[3]);
-		CCLOG("Left Trigger: %.2f", axes[4]);
-		CCLOG("Right Trigger: %.2f", axes[5]);
+		if (!isStuned) {
+			int axesCount;
+			const float* axes = glfwGetJoystickAxes(GLFW_JOYSTICK_2, &axesCount);
+			int buttonCount;
+			const unsigned char* buttons = glfwGetJoystickButtons(GLFW_JOYSTICK_2, &buttonCount);
+			const char* name = glfwGetJoystickName(GLFW_JOYSTICK_2);
+			/*
+			CCLOG("Axes Count: %d", axesCount);
+			CCLOG("Left Stick Hori: %.2f", axes[0]);
+			CCLOG("Left Stick Vert: %.2f", axes[1]);
+			CCLOG("Right Stick Hori: %.2f", axes[2]);
+			CCLOG("Right Stick Vert: %.2f", axes[3]);
+			CCLOG("Left Trigger: %.2f", axes[4]);
+			CCLOG("Right Trigger: %.2f", axes[5]);
 
-		CCLOG("Button Count: %d", buttonCount);
-		CCLOG("A: %d", buttons[0] == GLFW_PRESS);
-		CCLOG("B: %d", buttons[1] == GLFW_PRESS);
-		CCLOG("X: %d", buttons[2] == GLFW_PRESS);
-		CCLOG("Y: %d", buttons[3] == GLFW_PRESS);
-		CCLOG("LB: %d", buttons[4] == GLFW_PRESS);
-		CCLOG("RB: %d", buttons[5] == GLFW_PRESS);
-		CCLOG("Select: %d", buttons[6] == GLFW_PRESS);
-		CCLOG("Start: %d", buttons[7] == GLFW_PRESS);
-		CCLOG("LS: %d", buttons[8] == GLFW_PRESS);
-		CCLOG("RS: %d", buttons[9] == GLFW_PRESS);
-		CCLOG("UP: %d", buttons[10] == GLFW_PRESS);
-		CCLOG("RT: %d", buttons[11] == GLFW_PRESS);
-		CCLOG("DN: %d", buttons[12] == GLFW_PRESS);
-		CCLOG("LF: %d", buttons[13] == GLFW_PRESS);
-		*/
+			CCLOG("Button Count: %d", buttonCount);
+			CCLOG("A: %d", buttons[0] == GLFW_PRESS);
+			CCLOG("B: %d", buttons[1] == GLFW_PRESS);
+			CCLOG("X: %d", buttons[2] == GLFW_PRESS);
+			CCLOG("Y: %d", buttons[3] == GLFW_PRESS);
+			CCLOG("LB: %d", buttons[4] == GLFW_PRESS);
+			CCLOG("RB: %d", buttons[5] == GLFW_PRESS);
+			CCLOG("Select: %d", buttons[6] == GLFW_PRESS);
+			CCLOG("Start: %d", buttons[7] == GLFW_PRESS);
+			CCLOG("LS: %d", buttons[8] == GLFW_PRESS);
+			CCLOG("RS: %d", buttons[9] == GLFW_PRESS);
+			CCLOG("UP: %d", buttons[10] == GLFW_PRESS);
+			CCLOG("RT: %d", buttons[11] == GLFW_PRESS);
+			CCLOG("DN: %d", buttons[12] == GLFW_PRESS);
+			CCLOG("LF: %d", buttons[13] == GLFW_PRESS);
+			*/
 
-		if (axes[LS_HORI] > .15) {
-			orientation = 1;
-			acceleration.x = 3 * axes[0];
-		}
-		if (axes[LS_HORI] < -.15) {
-			orientation = -1;
-			acceleration.x = 3 * axes[0];
-		}
-		if (buttons[A] == GLFW_PRESS) {
-			if (canJump) {
-				acceleration.y += 200;
-				canJump = false;
+			if (axes[LS_HORI] > .15) {
+				orientation = 1;
+				acceleration.x = 3 * axes[0];
+			}
+			if (axes[LS_HORI] < -.15) {
+				orientation = -1;
+				acceleration.x = 3 * axes[0];
+			}
+			if (buttons[A] == GLFW_PRESS) {
+				if (canJump) {
+					acceleration.y += 200;
+					canJump = false;
+				}
+			}
+			if (buttons[B] == GLFW_PRESS) {
+				if (canJump) {
+					acceleration.x = 0;
+					velocity.x *= .8;
+				}
+			}
+			if (buttons[Y] == GLFW_PRESS) {
+				isAttacking = true;
+				attackButtonPressed = true;
+
 			}
 		}
-		if (buttons[B] == GLFW_PRESS) {
-			if (canJump) {
-				acceleration.x = 0;
-				velocity.x *= .8;
+	}
+		if (onGround) {
+			if (velocity.y < 0) {
+				acceleration.y = 0;
+				velocity.y = 0;
+				canJump = true;
 			}
+			velocity += acceleration;
 		}
-		if (buttons[Y] == GLFW_PRESS) {
-			isAttacking = true;
+		else {
+			velocity += acceleration + gravity * dt;
 		}
-	}
-	if (onGround) {
-		if (velocity.y < 0) {
-			acceleration.y = 0;
-			velocity.y = 0;
-			canJump = true;
-		}
-		velocity += acceleration;
-	}
-	else {
-		velocity += acceleration + gravity * dt;
-	}
+	
 
-	setHitBox(Rect(position.x - radius, position.y - radius, 2*radius, 2*radius));
+		setHitBox(Rect(position.x - radius, position.y - radius, 2 * radius, 2 * radius));
 
-	position += velocity * dt;
-	playerSprite->setPosition(position);
-	boundingBox.origin = position;
+		position += velocity * dt;
+		playerSprite->setPosition(position);
+		boundingBox.origin = position;
+	
 }
 bool Player::hitDeathPlane(Vec2 currentPosition) {
 	Vec2 tileCoord = tileCoordForPosition(currentPosition);
 	int tileGid = _DeathPlane->getTileGIDAt(tileCoord);
 	if (tileGid) {
+		damage = 0.0;
 		return true;
 	}
+	return false;
+}
+bool Player::ComboChain(float dtF, float dtI) {
+	//Only works if the next attack input happens two seconds or less after the previous
+	if (abs(dtI-comboStartTime) <0.05 && numTimesAttacked<=3 && attackButtonPressed) {
+		attackButtonPressed = false;
+		numTimesAttacked += 1;
+		CCLOG("Num times attcked %u", numTimesAttacked);
+		return true;
+	}
+
+	attackButtonPressed = false;
+	numTimesAttacked = 0;
 	return false;
 }
 
@@ -375,6 +416,7 @@ void Player::updateStunStatus() {
 	
 }
 bool Player::Attacked() {
+	attackButtonPressed = true;
 	return isAttacking;
 }
 

@@ -48,6 +48,7 @@ bool BallBounce::init()
 
 
 	gravity = 400;
+	dtF = 0;
 
 	_MainMap = TMXTiledMap::create("mainMap.tmx");
 	auto background = _MainMap->getLayer("Background");
@@ -72,15 +73,29 @@ bool BallBounce::init()
 	this->scheduleUpdate();
 	this->addChild(node);
 
+
 	return true;
 }
 
 void BallBounce::update(float dt) {
-	CCLOG("Player Position %f", playerOne->position.y);
-	CCLOG("Enemy Position %f", playerTwo->position.y);
-
+	//CCLOG("Player Position %f", playerOne->position.y);
+	//CCLOG("Enemy Position %f", playerTwo->position.y);
+	//CCLOG("Initial Time %f", dtI);
+	//CCLOG("Final Time %f", dtF);
+	dtI = dtF;
+	dtF+= dt;
 	playerOne->update(dt);
 	playerTwo->update(dt);
+
+	if (playerOne->beginComboChain) {
+		if (!playerOne->ComboChain(dtF, dtI)) {
+			playerOne->beginComboChain = false;
+			calculateKnockback(playerTwo, playerOne);
+			//Other player is knocked back once the chain ends.
+			playerTwo->isStuned = false;
+			playerOne->onCooldown = true;
+		}
+	}
 	if (playerOne->Attacked()) {
 		if (playerOne->orientation == 1) {
 			playerOne->setAttackBox(Rect(playerOne->position.x + 10, playerOne->position.y, 10, 10));
@@ -90,8 +105,33 @@ void BallBounce::update(float dt) {
 		}
 		if (checkForCollision(playerOne->attackBox, playerTwo->hitBox)) {
 			//Play knockback animation
-			calculateKnockback(playerTwo, playerOne);
+			if (playerOne->onGround) {
+				if (!playerOne->onCooldown) {
+					if (playerOne->beginComboChain == false) {
+						playerOne->beginComboChain = true;
+						playerOne->comboStartTime = dtF;
+					}
+					//Begining a combo chain on the ground
+					if (playerOne->ComboChain(dtF, dtI)) {
+						playerTwo->damage += 2.5;
+						playerTwo->isStuned = true;
+					}
+				}
+			}
+			else {
+				playerTwo->damage += 1.2;
+				calculateKnockback(playerTwo, playerOne);
+			}
 		}
+	}
+	if (playerTwo->beginComboChain) {
+		if (!playerTwo->ComboChain(dtF, dtI)) {
+			playerTwo->beginComboChain = false;
+			calculateKnockback(playerOne, playerTwo);
+			playerOne->isStuned = false;
+			playerTwo->onCooldown = true;
+		}
+		
 	}
 	if (playerTwo->Attacked()) {
 		if (playerTwo->orientation == 1) {
@@ -101,8 +141,23 @@ void BallBounce::update(float dt) {
 			playerTwo->setAttackBox(Rect(playerTwo->position.x - 10, playerTwo->position.y, -10, 10));
 		}
 		if (checkForCollision(playerTwo->attackBox, playerOne->hitBox)) {
-			//Play knockback animation
-			calculateKnockback(playerOne, playerTwo);
+			if (playerTwo->onGround) {
+				if (!playerTwo->onCooldown) {
+					if (playerTwo->beginComboChain == false) {
+						playerTwo->beginComboChain = true;
+						playerTwo->comboStartTime = dtF;
+					}
+					//Begining a combo chain on the ground
+					if (playerTwo->ComboChain(dtF, dtI)) {
+						playerOne->damage += 2.5;
+						playerOne->isStuned = true;
+					}
+				}
+			}
+			else {
+				playerOne->damage += 1.2;
+				calculateKnockback(playerOne, playerTwo);
+			}
 		}
 	}
 	// For debugging purposes
@@ -136,6 +191,8 @@ void BallBounce::update(float dt) {
 			drawBox(node, Rect(playerTwo->position.x - 10, playerTwo->position.y, -10, 10));
 		}
 	}
+	
+	
 }
 
 void BallBounce::setViewPointCenter(Vec2 Position) {
@@ -162,7 +219,7 @@ bool BallBounce::checkForCollision(Rect Attacker, Rect Reciver) {
 	return false;
 }
 void BallBounce::calculateKnockback(Player* Reciver, Player* Attacker) {
-	Reciver->acceleration.x += (20 * Attacker->orientation);
+	Reciver->acceleration.x += (50* Attacker->orientation * Reciver->damage);
 	if (Reciver->position.y >= Attacker->position.y) {
 		Reciver->acceleration.y += 50;
 	}

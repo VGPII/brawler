@@ -145,7 +145,7 @@ void MainMenu::updateMenu() {
     }
     if (cursorMoved) {
         if (cursorPosition == 1) {
-            Start2->setVisible(true);
+            Start2->setVisible(true); 
             Start1->setVisible(false);
         }
         else {

@@ -60,6 +60,8 @@ public:
 	bool onGround;
 	float maxVel = 500;
 	float radius;
+	float dtF; // Current Time
+	float dtI; // Previous Time
 
 	bool debugMode = false;
 	void drawBox(DrawNode* node, Vec2 bottomLeft, Vec2 topRight);
