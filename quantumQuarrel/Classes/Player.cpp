@@ -75,6 +75,9 @@ bool Player::init(int gravStrength, TMXTiledMap* initMap, Rect initBoundingBox, 
 	acceleration = cocos2d::Vec2(0, 0);
 	gravity = cocos2d::Vec2(0, -gravStrength);
 	radius = playerSprite->getBoundingBox().size.width / 2;
+	width = playerSprite->getBoundingBox().size.width;
+	height = playerSprite->getBoundingBox().size.height;
+	footPos = Vec2(position.x, position.y - (height / 2));
 	canJump = true;
 
 	setHitBox(Rect(position.x - radius, position.y - radius, 2 * radius, 2 * radius));
@@ -137,6 +140,7 @@ void Player::loadAnimations() {
 
 void Player::update(float dt) { // dt is in seconds
 	isAttacking = false;
+	
 	if (isStuned) {
 		velocity = Vec2(0, 0);
 		acceleration = Vec2(0, 0);
@@ -156,26 +160,28 @@ void Player::update(float dt) { // dt is in seconds
 			comboCooldown = comboCooldownTime;
 		}
 	}
-	if (InAir(position)) {
+	auto isInAir = InAir(footPos);
+	if (InAir(footPos)) { // check foot position
 		onGround = false;
 		acceleration = cocos2d::Vec2(0, 0);
-		if (position.x < 0 + radius || position.x > boundingBox.getMaxX() - radius) {
+		//check if on screen
+		if (position.x < 0 + (width / 2) || position.x > boundingBox.getMaxX() - (width/2)) {
 			velocity.x *= 0;
-			if (position.x < 0 + radius) {
-				position.x = 0 + radius;
+			if (position.x < 0 + (width / 2)) {
+				position.x = 0 + (width / 2);
 			}
 			else {
-				position.x = boundingBox.getMaxX() - radius;
+				position.x = boundingBox.getMaxX() - (width / 2);
 			}
 		}
-		if (position.y < 0 + radius || position.y > boundingBox.getMaxY() - radius) {
+		if (position.y < 0 + (height / 2) || position.y > boundingBox.getMaxY() - (height / 2)) {
 			canJump = true;
 			velocity.y *= 0;
-			if (position.y < 0 + radius) {
-				position.y = 0 + radius;
+			if (position.y < 0 + (height / 2)) {
+				position.y = 0 + (height / 2);
 			}
 			else {
-				position.y = boundingBox.getMaxY() - radius;
+				position.y = boundingBox.getMaxY() - (height / 2);
 			}
 		}
 	}
@@ -214,31 +220,7 @@ void Player::update(float dt) { // dt is in seconds
 		int buttonCount;
 		const unsigned char* buttons = glfwGetJoystickButtons(GLFW_JOYSTICK_1, &buttonCount);
 		const char* name = glfwGetJoystickName(GLFW_JOYSTICK_1);
-		/*
-		CCLOG("Axes Count: %d", axesCount);
-		CCLOG("Left Stick Hori: %.2f", axes[0]);
-		CCLOG("Left Stick Vert: %.2f", axes[1]);
-		CCLOG("Right Stick Hori: %.2f", axes[2]);
-		CCLOG("Right Stick Vert: %.2f", axes[3]);
-		CCLOG("Left Trigger: %.2f", axes[4]);
-		CCLOG("Right Trigger: %.2f", axes[5]);
 
-		CCLOG("Button Count: %d", buttonCount);
-		CCLOG("A: %d", buttons[0] == GLFW_PRESS);
-		CCLOG("B: %d", buttons[1] == GLFW_PRESS);
-		CCLOG("X: %d", buttons[2] == GLFW_PRESS);
-		CCLOG("Y: %d", buttons[3] == GLFW_PRESS);
-		CCLOG("LB: %d", buttons[4] == GLFW_PRESS);
-		CCLOG("RB: %d", buttons[5] == GLFW_PRESS);
-		CCLOG("Select: %d", buttons[6] == GLFW_PRESS);
-		CCLOG("Start: %d", buttons[7] == GLFW_PRESS);
-		CCLOG("LS: %d", buttons[8] == GLFW_PRESS);
-		CCLOG("RS: %d", buttons[9] == GLFW_PRESS);
-		CCLOG("UP: %d", buttons[10] == GLFW_PRESS);
-		CCLOG("RT: %d", buttons[11] == GLFW_PRESS);
-		CCLOG("DN: %d", buttons[12] == GLFW_PRESS);
-		CCLOG("LF: %d", buttons[13] == GLFW_PRESS);
-		*/
 		//Moving right
 		if (axes[LS_HORI] > .15) {
 			acceleration.x = 3 * axes[0];
@@ -251,7 +233,7 @@ void Player::update(float dt) { // dt is in seconds
 		}
 
 		//Moving Left
-		if (axes[LS_HORI] < -.15) {
+		else if (axes[LS_HORI] < -.15) {
 			acceleration.x = 3 * axes[0];
 			orientation = -1;
 			if (playerSprite->getActionByTag(1) == nullptr) {
@@ -261,6 +243,9 @@ void Player::update(float dt) { // dt is in seconds
 				//playerSprite->setScaleY(0.3);
 			}
 
+		}
+		else {
+			acceleration.x = 0;
 		}
 		if (buttons[A] == GLFW_PRESS) {
 			if (canJump) {
@@ -277,7 +262,7 @@ void Player::update(float dt) { // dt is in seconds
 		if (buttons[B] == GLFW_PRESS) {
 			if (canJump) {
 				acceleration.x = 0;
-				velocity.x *= .8;
+				velocity.x *= .5;
 			}
 		}
 		if (buttons[Y] == GLFW_PRESS) {
@@ -293,32 +278,7 @@ void Player::update(float dt) { // dt is in seconds
 			int buttonCount;
 			const unsigned char* buttons = glfwGetJoystickButtons(GLFW_JOYSTICK_2, &buttonCount);
 			const char* name = glfwGetJoystickName(GLFW_JOYSTICK_2);
-			/*
-			CCLOG("Axes Count: %d", axesCount);
-			CCLOG("Left Stick Hori: %.2f", axes[0]);
-			CCLOG("Left Stick Vert: %.2f", axes[1]);
-			CCLOG("Right Stick Hori: %.2f", axes[2]);
-			CCLOG("Right Stick Vert: %.2f", axes[3]);
-			CCLOG("Left Trigger: %.2f", axes[4]);
-			CCLOG("Right Trigger: %.2f", axes[5]);
-
-			CCLOG("Button Count: %d", buttonCount);
-			CCLOG("A: %d", buttons[0] == GLFW_PRESS);
-			CCLOG("B: %d", buttons[1] == GLFW_PRESS);
-			CCLOG("X: %d", buttons[2] == GLFW_PRESS);
-			CCLOG("Y: %d", buttons[3] == GLFW_PRESS);
-			CCLOG("LB: %d", buttons[4] == GLFW_PRESS);
-			CCLOG("RB: %d", buttons[5] == GLFW_PRESS);
-			CCLOG("Select: %d", buttons[6] == GLFW_PRESS);
-			CCLOG("Start: %d", buttons[7] == GLFW_PRESS);
-			CCLOG("LS: %d", buttons[8] == GLFW_PRESS);
-			CCLOG("RS: %d", buttons[9] == GLFW_PRESS);
-			CCLOG("UP: %d", buttons[10] == GLFW_PRESS);
-			CCLOG("RT: %d", buttons[11] == GLFW_PRESS);
-			CCLOG("DN: %d", buttons[12] == GLFW_PRESS);
-			CCLOG("LF: %d", buttons[13] == GLFW_PRESS);
-			*/
-
+			
 			if (axes[LS_HORI] > .15) {
 				orientation = 1;
 				acceleration.x = 3 * axes[0];
@@ -350,7 +310,11 @@ void Player::update(float dt) { // dt is in seconds
 			if (velocity.y < 0) {
 				acceleration.y = 0;
 				velocity.y = 0;
+				setFootPos(Vec2(footPos.x, int(footPos.y) + int(_CurMap->getTileSize().height) - (int(footPos.y) % int(_CurMap->getTileSize().height))));
 				canJump = true;
+			}
+			if (acceleration.x == 0) {
+				velocity.x *= .8;
 			}
 			velocity += acceleration;
 		}
@@ -358,12 +322,17 @@ void Player::update(float dt) { // dt is in seconds
 			velocity += acceleration + gravity * dt;
 		}
 	
-
+		if (orientation == 1) {
+			setAttackBox(Rect(position.x + 10, position.y, 10, 10));
+		}
+		else {
+			setAttackBox(Rect(position.x - 10, position.y, -10, 10));
+		}
 		setHitBox(Rect(position.x - radius, position.y - radius, 2 * radius, 2 * radius));
 
 		position += velocity * dt;
+		footPos = Vec2(position.x, position.y - (height / 2));
 		playerSprite->setPosition(position);
-		boundingBox.origin = position;
 	
 }
 bool Player::hitDeathPlane(Vec2 currentPosition) {
@@ -405,6 +374,11 @@ void Player::setAttackBox(Rect newBox) {
 	attackBox = newBox;
 }
 
+void Player::setFootPos(Vec2 newPos) {
+	footPos = newPos;
+	position = Vec2(footPos.x, footPos.y + (height / 2));
+}
+
 
 void Player::updateStunStatus() {
 	if (!isStuned) {
@@ -421,7 +395,7 @@ bool Player::Attacked() {
 }
 
 Vec2 Player::tileCoordForPosition(Vec2 CurrentPosition) {
-	int x = position.x / _CurMap->getTileSize().width; // tile x coord
-	int y = ((_CurMap->getMapSize().height * _CurMap->getTileSize().height) - position.y) / _CurMap->getTileSize().height; // tile y coord
+	int x = CurrentPosition.x / _CurMap->getTileSize().width; // tile x coord
+	int y = ((_CurMap->getMapSize().height * _CurMap->getTileSize().height) - CurrentPosition.y) / _CurMap->getTileSize().height; // tile y coord
 	return cocos2d::Vec2(x, y); // return tile coords
 }

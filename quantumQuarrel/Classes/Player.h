@@ -20,6 +20,7 @@ public:
 	bool Attacked();
 	void setHitBox(Rect);
 	void setAttackBox(Rect);
+	void Player::setFootPos(Vec2);
 	bool ComboChain(float dtF, float dtI);
 	int numTimesAttacked;
 	float comboStartTime;
@@ -54,6 +55,7 @@ public:
 	TMXTiledMap* _CurMap;
 	Sprite *playerSprite;
 	Vec2 position;
+	Vec2 footPos;
 	Vec2 velocity;
 	Vec2 acceleration;
 	Vec2 gravity;
@@ -66,6 +68,8 @@ public:
 	bool attackButtonPressed;
 	float maxVel = 500;
 	float radius;
+	float height;
+	float width;
 
 
 };

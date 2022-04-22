@@ -65,7 +65,7 @@ public:
 
 	bool debugMode = false;
 	void drawBox(DrawNode* node, Vec2 bottomLeft, Vec2 topRight);
-	void drawBox(DrawNode* node, Rect rectangle);
+	void drawBox(DrawNode* node, Rect rectangle, Color4F color);
 };
 
 
