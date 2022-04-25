@@ -23,10 +23,14 @@ USING_NS_CC;
 #define RT 11
 #define DN 12
 #define LF 13
+
 #define JUMP_TAG 3
 #define WALK_TAG 1
 #define IDLE_TAG 0
 #define NULL_TAG -1
+
+#define SPRITE_SCALE 0.2
+
 bool Player::init(int gravStrength, TMXTiledMap* initMap, Rect initBoundingBox, int playerNumberInit)
 {
 	boundingBox = initBoundingBox;
@@ -43,20 +47,19 @@ bool Player::init(int gravStrength, TMXTiledMap* initMap, Rect initBoundingBox, 
 	comboCooldown = comboCooldownTime;
 	onCooldown = false;
 
-
 	objectGroup = _CurMap->getObjectGroup("SpawnPoints");
 	playerNumber = playerNumberInit;
 
 	if (objectGroup == NULL) {
 		CCLOG("Tile map does not have an object layer");
 	}
-	
+	playerSprite = Sprite::create("/PlayerAnimation/walk/Walking_animation_1.png");
+	playerSprite->setScale(SPRITE_SCALE);
+
 	if (playerNumber == 1) {
 		ValueMap spawnPoint = objectGroup->getObject("SpawnPointP1");
 		Spawnpoint = Vec2(spawnPoint.at("x").asInt() * _CurMap->getScaleX(), spawnPoint.at("y").asInt()* _CurMap->getScaleY());
 		orientation = 1; // Facing towards the right side of the screen
-		playerSprite = Sprite::create("ball.png");
-		playerSprite->setVisible(true);
 		//Will need a loop to instantiate all of the animation types
 		loadAnimations();
 	}
@@ -64,8 +67,6 @@ bool Player::init(int gravStrength, TMXTiledMap* initMap, Rect initBoundingBox, 
 		ValueMap spawnPoint = objectGroup->getObject("SpawnPointP2");
 		Spawnpoint = Vec2(spawnPoint.at("x").asInt() * _CurMap->getScaleX(), spawnPoint.at("y").asInt() * _CurMap->getScaleY());
 		orientation = -1; // Facing towards the left side of the screen
-		playerSprite = Sprite::create("ball_blue.png");
-
 	}
 	
 	
@@ -80,7 +81,7 @@ bool Player::init(int gravStrength, TMXTiledMap* initMap, Rect initBoundingBox, 
 	footPos = Vec2(position.x, position.y - (height / 2));
 	canJump = true;
 
-	setHitBox(Rect(position.x - radius, position.y - radius, 2 * radius, 2 * radius));
+	setHitBox(Rect(position.x - width/2, position.y - height/2, width, height));
 
 	if (orientation == 1) {
 		attackBox = Rect(position.x + 10, position.y, 10, 10);
@@ -102,8 +103,7 @@ void Player::loadAnimations() {
 	//Loading jumping animation
 	for (int i = 1; i <= NUM_JUMP_FRAMES; i++) {
 		sprintf(str, "/PlayerAnimation/Jump/jumping_animation_%i.png", i);
-		auto frame = SpriteFrame::create(str, Rect(position.x, position.y, 221, 572), false, Vec2(0, 300), Size(221, 572));
-
+		auto frame = SpriteFrame::create(str, Rect(position.x, position.y, 221, 572), false, Vec2(0, 0), Size(221, 572));
 		JumpAnimation.pushBack(frame);
 	}
 	auto tmpAnimation = Animation::createWithSpriteFrames(JumpAnimation, 0.12f);
@@ -114,7 +114,7 @@ void Player::loadAnimations() {
 	//Loading Walking animation
 	for (int i = 1; i <= NUM_WALK_FRAMES; i++) {
 		sprintf(str, "/PlayerAnimation/walk/Walking_animation_%i.png", i);
-		auto frame = SpriteFrame::create(str, Rect(position.x, position.y, 200, 609), false, Vec2(0, 300), Size(200, 609));
+		auto frame = SpriteFrame::create(str, Rect(position.x, position.y, 200, 609), false, Vec2(0, 0), Size(200, 609));
 		walkAnimation.pushBack(frame);
 	}
 	tmpAnimation = Animation::createWithSpriteFrames(walkAnimation, 0.09f);
@@ -125,8 +125,8 @@ void Player::loadAnimations() {
 	//Loading idle animation
 	//Will fully implement later
 	for (int i = 1; i <= NUM_IDLE_FRAMES; i++) {
-		sprintf(str, "ball.png", i);
-		auto frame = SpriteFrame::create(str, Rect(position.x, position.y, 32, 32), false, Vec2(0, 0), Size(32, 32));
+		sprintf(str, "/PlayerAnimation/walk/Walking_animation_%i.png", i);
+		auto frame = SpriteFrame::create(str, Rect(position.x, position.y, 200, 609), false, Vec2(0, 0), Size(200, 609));
 		idleAnimation.pushBack(frame);
 	}
 
@@ -146,11 +146,7 @@ void Player::update(float dt) { // dt is in seconds
 		acceleration = Vec2(0, 0);
 	}
 	if (hitDeathPlane(position)) {
-		position = Spawnpoint;
-		playerSprite->setPosition(position);
-		velocity = Vec2(0, 0);
-		acceleration = Vec2(0, 0);
-		canJump = true;
+		reset();
 		return;
 	}
 	if (onCooldown) {
@@ -166,38 +162,26 @@ void Player::update(float dt) { // dt is in seconds
 		acceleration = cocos2d::Vec2(0, 0);
 		//check if on screen
 		if (position.x < 0 + (width / 2) || position.x > boundingBox.getMaxX() - (width/2)) {
-			velocity.x *= 0;
-			if (position.x < 0 + (width / 2)) {
-				position.x = 0 + (width / 2);
-			}
-			else {
-				position.x = boundingBox.getMaxX() - (width / 2);
-			}
+			reset();
+			return;
 		}
 		if (position.y < 0 + (height / 2) || position.y > boundingBox.getMaxY() - (height / 2)) {
-			canJump = true;
-			velocity.y *= 0;
-			if (position.y < 0 + (height / 2)) {
-				position.y = 0 + (height / 2);
-			}
-			else {
-				position.y = boundingBox.getMaxY() - (height / 2);
-			}
+			reset();
+			return;
 		}
 	}
 	else {
 		onGround = true;
 		//Temp statement 
 		if (playerNumber == 1) {
-			playerSprite->stopActionByTag(3);
+			playerSprite->stopActionByTag(JUMP_TAG);
 			jumping->setTag(NULL_TAG);
 			if (velocity.x == 0 && acceleration.x == 0) {
-				playerSprite->stopActionByTag(1);
+				playerSprite->stopActionByTag(WALK_TAG);
 				walking->setTag(NULL_TAG);
 				if (playerSprite->getActionByTag(IDLE_TAG) == nullptr) {
 					idling->setTag(IDLE_TAG);
-					//playerSprite->runAction(idling);
-					playerSprite->setScale(1);
+					playerSprite->runAction(idling);
 				}
 
 			}
@@ -227,7 +211,8 @@ void Player::update(float dt) { // dt is in seconds
 			orientation = 1;
 			if (playerSprite->getActionByTag(1) == nullptr) {
 				walking->setTag(WALK_TAG);
-				//playerSprite->runAction(walking);
+				playerSprite->runAction(walking);
+				playerSprite->setScaleX(SPRITE_SCALE);
 				//playerSprite->setScale(0.3);
 			}
 		}
@@ -238,7 +223,9 @@ void Player::update(float dt) { // dt is in seconds
 			orientation = -1;
 			if (playerSprite->getActionByTag(1) == nullptr) {
 				walking->setTag(WALK_TAG);
-				//playerSprite->runAction(walking);
+				playerSprite->runAction(walking);
+				playerSprite->setScaleX(-SPRITE_SCALE);
+				playerSprite->setScaleY(SPRITE_SCALE);
 				//playerSprite->setScaleX(-0.3);
 				//playerSprite->setScaleY(0.3);
 			}
@@ -251,9 +238,10 @@ void Player::update(float dt) { // dt is in seconds
 			if (canJump) {
 				acceleration.y += 200;
 				canJump = false;
-				if (playerSprite->getActionByTag(3) == nullptr) {
+				if (playerSprite->getActionByTag(JUMP_TAG) == nullptr) {
 					jumping->setTag(JUMP_TAG);
-					//playerSprite->runAction(jumping);
+					playerSprite->runAction(jumping);
+					playerSprite->setScale(SPRITE_SCALE);
 					//playerSprite->setScale(0.3);
 				}
 
@@ -328,7 +316,7 @@ void Player::update(float dt) { // dt is in seconds
 		else {
 			setAttackBox(Rect(position.x - 10, position.y, -10, 10));
 		}
-		setHitBox(Rect(position.x - radius, position.y - radius, 2 * radius, 2 * radius));
+		setHitBox(Rect(position.x - width/2, position.y - height/2, width, height));
 
 		position += velocity * dt;
 		footPos = Vec2(position.x, position.y - (height / 2));
@@ -346,7 +334,7 @@ bool Player::hitDeathPlane(Vec2 currentPosition) {
 }
 bool Player::ComboChain(float dtF, float dtI) {
 	//Only works if the next attack input happens two seconds or less after the previous
-	if (abs(dtI-comboStartTime) <0.05 && numTimesAttacked<=3 && attackButtonPressed) {
+	if (abs(dtI-comboStartTime) < 0.05 && numTimesAttacked<=3 && attackButtonPressed) { 
 		attackButtonPressed = false;
 		numTimesAttacked += 1;
 		CCLOG("Num times attcked %u", numTimesAttacked);
@@ -398,4 +386,12 @@ Vec2 Player::tileCoordForPosition(Vec2 CurrentPosition) {
 	int x = CurrentPosition.x / _CurMap->getTileSize().width; // tile x coord
 	int y = ((_CurMap->getMapSize().height * _CurMap->getTileSize().height) - CurrentPosition.y) / _CurMap->getTileSize().height; // tile y coord
 	return cocos2d::Vec2(x, y); // return tile coords
+}
+
+void Player::reset() {
+	position = Spawnpoint;
+	playerSprite->setPosition(position);
+	velocity = Vec2(0, 0);
+	acceleration = Vec2(0, 0);
+	canJump = true;
 }

@@ -41,7 +41,7 @@ bool BallBounce::init()
 		return false;
 	}
 	
-	debugMode = true; //Comment out to remove debugLines
+	//debugMode = true; //Comment out to remove debugLines
 
 	winSize = cocos2d::Director::getInstance()->getWinSize();
 	node = DrawNode::create(2);
@@ -164,7 +164,8 @@ void BallBounce::update(float dt) {
 		//attackboxes
 		drawBox(node, playerOne->attackBox, Color4F::WHITE);
 		drawBox(node, playerTwo->attackBox, Color4F::BLUE);	
-		node->drawPoint(playerOne->footPos, 5, Color4F::BLUE);
+		node->drawPoint(playerOne->footPos, 5, Color4F::WHITE);
+		node->drawPoint(playerTwo->footPos, 5, Color4F::BLUE);
 		//tiles
 		/*
 		auto winWidth = _MainMap->getMapSize().width;

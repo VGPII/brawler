@@ -20,7 +20,9 @@ public:
 	bool Attacked();
 	void setHitBox(Rect);
 	void setAttackBox(Rect);
-	void Player::setFootPos(Vec2);
+	void setFootPos(Vec2);
+	void reset();
+
 	bool ComboChain(float dtF, float dtI);
 	int numTimesAttacked;
 	float comboStartTime;
@@ -50,6 +52,7 @@ public:
 	float comboCooldown;
 	float comboCooldownTime;
 	bool onCooldown;
+	float lastAttackTime;
     
 
 	TMXTiledMap* _CurMap;
@@ -70,6 +73,5 @@ public:
 	float radius;
 	float height;
 	float width;
-
 
 };
