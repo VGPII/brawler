@@ -84,10 +84,10 @@ bool Player::init(int gravStrength, TMXTiledMap* initMap, Rect initBoundingBox, 
 	setHitBox(Rect(position.x - width/2, position.y - height/2, width, height));
 
 	if (orientation == 1) {
-		attackBox = Rect(position.x + 10, position.y, 10, 10);
+		attackBox = Rect(position.x + width/2, position.y-width/4, width, height/2);
 	}
 	else if (orientation == -1) {
-		attackBox = Rect(position.x - 10, position.y, -10, 10);
+		attackBox = Rect(position.x - 3*(width / 2), position.y - width / 4, width, height / 2);
 	}
 	isStuned = false;
 	isAttacking = false;
@@ -311,10 +311,10 @@ void Player::update(float dt) { // dt is in seconds
 		}
 	
 		if (orientation == 1) {
-			setAttackBox(Rect(position.x + 10, position.y, 10, 10));
+			setAttackBox(Rect(position.x + width / 2, position.y - width / 4, width, height / 2));
 		}
 		else {
-			setAttackBox(Rect(position.x - 10, position.y, -10, 10));
+			setAttackBox(Rect(position.x - 3 * (width / 2), position.y - width / 4, width, height / 2));
 		}
 		setHitBox(Rect(position.x - width/2, position.y - height/2, width, height));
 
