@@ -1,5 +1,5 @@
 #include "Player.h"
-
+#include "AudioEngine.h"
 USING_NS_CC;
 
 #define LS_HORI 0
@@ -94,7 +94,6 @@ bool Player::init(int gravStrength, TMXTiledMap* initMap, Rect initBoundingBox, 
 	attackButtonPressed = false;
 	//Setting number of animation frames
 	
-
 	return true;
 }
 void Player::loadAnimations() {
@@ -135,6 +134,8 @@ void Player::loadAnimations() {
 	idleAnimate->retain();
 	idling = idleAnimate;
 	
+	//start playing the background music when the map loads in
+	background_id = AudioEngine::play2d("audio/background.mp3", true, 0.5f);
 
 }
 
@@ -146,6 +147,7 @@ void Player::update(float dt) { // dt is in seconds
 		acceleration = Vec2(0, 0);
 	}
 	if (hitDeathPlane(position)) {
+		death_id = AudioEngine::play2d("audio/death.mp3", false, 1.0f);
 		reset();
 		return;
 	}
@@ -236,6 +238,12 @@ void Player::update(float dt) { // dt is in seconds
 		}
 		if (buttons[A] == GLFW_PRESS) {
 			if (canJump) {
+				//stop the old jump sound effect to avoid stacking together
+				AudioEngine::stop(jump_id);
+				//preload and play the jump mp3
+				AudioEngine::preload("audio/jump.mp3");
+				jump_id = AudioEngine::play2d("audio/jump.mp3", false, 1.0f);
+
 				acceleration.y += 200;
 				canJump = false;
 				if (playerSprite->getActionByTag(JUMP_TAG) == nullptr) {
@@ -256,6 +264,12 @@ void Player::update(float dt) { // dt is in seconds
 		if (buttons[Y] == GLFW_PRESS) {
 			isAttacking = true;
 			attackButtonPressed = true;
+
+			//stopping the last attack mp3 to avoid stacking the sound effects
+			AudioEngine::stop(attack_miss_id);
+			//preload and then play the attack mp3
+			AudioEngine::preload("audio/attack_miss.mp3");
+			attack_miss_id = AudioEngine::play2d("audio/attack_miss.mp3", false, 1.0f);
 		}
 	}
 }

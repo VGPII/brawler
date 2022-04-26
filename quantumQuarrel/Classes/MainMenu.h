@@ -28,6 +28,7 @@
 
 #include "cocos2d.h"
 #include "BallBounceScene.h"
+#include "audio/include/AudioEngine.h" USING_NS_CC;
 
 using namespace cocos2d;
 
@@ -59,6 +60,8 @@ public:
 	int NUM_OF_MENU_ITEMS = 2;
 	int previousCursorPosition;
 	bool cursorMoved;
+	int background_id;
+	int intro_id;
 };
 
 #endif // __MAINMENU__H__

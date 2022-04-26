@@ -24,6 +24,7 @@
 
 #include "MainMenu.h"
 #include <math.h>
+#include "audio/include/AudioEngine.h";
 
 USING_NS_CC;
 
@@ -82,6 +83,8 @@ bool MainMenu::init() {
 
     this->scheduleUpdate();
 
+	int background_id = AudioEngine::play2d("audio/background.mp3", true, 0.5f);
+
     schedule(CC_SCHEDULE_SELECTOR(MainMenu::getControllerInput), 0.1f, kRepeatForever, 0); // get controller input every 0.1 seconds
 	return true;
 	
@@ -96,6 +99,8 @@ void MainMenu::update(float dt) {
 void MainMenu::ExitMainMenu() {
     if (cursorPosition == 1) {
         //Load main Game
+		AudioEngine::stopAll();
+		intro_id = AudioEngine::play2d("audio/intro.mp3", false, 1.0f);
         auto mainGame =  BallBounce::createScene();
         Director::getInstance()->replaceScene(mainGame);
     }

@@ -74,4 +74,10 @@ public:
 	float height;
 	float width;
 
+	int attack_miss_id;
+	int attack_hit_id;
+	int jump_id;
+	int death_id;
+	int background_id;
+
 };
