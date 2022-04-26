@@ -28,14 +28,14 @@
 
 #include "cocos2d.h"
 #include "BallBounceScene.h"
-#include "audio/include/AudioEngine.h" USING_NS_CC;
+#include "audio/include/AudioEngine.h"
 
 using namespace cocos2d;
 
 class MainMenu : public cocos2d::Scene
 {
 public:
-	static cocos2d::Scene* createScene();
+	static cocos2d::Scene* createScene(bool prevbutton);
 
 	virtual bool init();
 	void update(float dt);
@@ -43,6 +43,7 @@ public:
 	void getControllerInput(float dt);
 	void ExitMainMenu();
 	bool menuItemSelected;
+	bool buttonCooldown;
 	bool controllerPresence;
 	const float* axes;
 	int axesCount;

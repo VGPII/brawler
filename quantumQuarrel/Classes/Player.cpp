@@ -1,5 +1,6 @@
 #include "Player.h"
 #include "AudioEngine.h"
+
 USING_NS_CC;
 
 #define LS_HORI 0
@@ -23,14 +24,11 @@ USING_NS_CC;
 #define RT 11
 #define DN 12
 #define LF 13
-
 #define JUMP_TAG 3
 #define WALK_TAG 1
 #define IDLE_TAG 0
 #define NULL_TAG -1
-
-#define SPRITE_SCALE 0.2
-
+#define SPRITE_SCALE 0.2	
 bool Player::init(int gravStrength, TMXTiledMap* initMap, Rect initBoundingBox, int playerNumberInit)
 {
 	boundingBox = initBoundingBox;
@@ -47,15 +45,16 @@ bool Player::init(int gravStrength, TMXTiledMap* initMap, Rect initBoundingBox, 
 	comboCooldown = comboCooldownTime;
 	onCooldown = false;
 
+
 	objectGroup = _CurMap->getObjectGroup("SpawnPoints");
 	playerNumber = playerNumberInit;
 
 	if (objectGroup == NULL) {
 		CCLOG("Tile map does not have an object layer");
 	}
+	
 	playerSprite = Sprite::create("/PlayerAnimation/walk/Walking_animation_1.png");
 	playerSprite->setScale(SPRITE_SCALE);
-
 	if (playerNumber == 1) {
 		ValueMap spawnPoint = objectGroup->getObject("SpawnPointP1");
 		Spawnpoint = Vec2(spawnPoint.at("x").asInt() * _CurMap->getScaleX(), spawnPoint.at("y").asInt()* _CurMap->getScaleY());
@@ -67,33 +66,33 @@ bool Player::init(int gravStrength, TMXTiledMap* initMap, Rect initBoundingBox, 
 		ValueMap spawnPoint = objectGroup->getObject("SpawnPointP2");
 		Spawnpoint = Vec2(spawnPoint.at("x").asInt() * _CurMap->getScaleX(), spawnPoint.at("y").asInt() * _CurMap->getScaleY());
 		orientation = -1; // Facing towards the left side of the screen
-	}
-	
-	
+		playerSprite = Sprite::create("ball_blue.png");
 
+	}
 	position = Spawnpoint;
 	velocity = cocos2d::Vec2(0, 0);
 	acceleration = cocos2d::Vec2(0, 0);
 	gravity = cocos2d::Vec2(0, -gravStrength);
 	radius = playerSprite->getBoundingBox().size.width / 2;
+	canJump = true;
 	width = playerSprite->getBoundingBox().size.width;
 	height = playerSprite->getBoundingBox().size.height;
 	footPos = Vec2(position.x, position.y - (height / 2));
-	canJump = true;
 
-	setHitBox(Rect(position.x - width/2, position.y - height/2, width, height));
+	setHitBox(Rect(position.x - width / 2, position.y - height / 2, width, height));
 
 	if (orientation == 1) {
-		attackBox = Rect(position.x + width/2, position.y-width/4, width, height/2);
+		attackBox = Rect(position.x + width / 2, position.y - width / 4, width, height / 2);
 	}
 	else if (orientation == -1) {
-		attackBox = Rect(position.x - 3*(width / 2), position.y - width / 4, width, height / 2);
+		attackBox = Rect(position.x + width / 2, position.y - width / 4, width, height / 2);
 	}
 	isStuned = false;
 	isAttacking = false;
 	attackButtonPressed = false;
 	//Setting number of animation frames
 	
+
 	return true;
 }
 void Player::loadAnimations() {
@@ -128,26 +127,23 @@ void Player::loadAnimations() {
 		auto frame = SpriteFrame::create(str, Rect(position.x, position.y, 200, 609), false, Vec2(0, 0), Size(200, 609));
 		idleAnimation.pushBack(frame);
 	}
-
 	tmpAnimation = Animation::createWithSpriteFrames(idleAnimation, 0.09f);
 	idleAnimate = Animate::create(tmpAnimation);
 	idleAnimate->retain();
 	idling = idleAnimate;
-	
-	//start playing the background music when the map loads in
+	//start playing the background music when the map loads in	
 	background_id = AudioEngine::play2d("audio/background.mp3", true, 0.5f);
+
 
 }
 
 void Player::update(float dt) { // dt is in seconds
 	isAttacking = false;
-	
 	if (isStuned) {
 		velocity = Vec2(0, 0);
 		acceleration = Vec2(0, 0);
 	}
 	if (hitDeathPlane(position)) {
-		death_id = AudioEngine::play2d("audio/death.mp3", false, 1.0f);
 		reset();
 		return;
 	}
@@ -159,11 +155,11 @@ void Player::update(float dt) { // dt is in seconds
 		}
 	}
 	auto isInAir = InAir(footPos);
-	if (InAir(footPos)) { // check foot position
+	if (InAir(footPos)) {
 		onGround = false;
 		acceleration = cocos2d::Vec2(0, 0);
-		//check if on screen
-		if (position.x < 0 + (width / 2) || position.x > boundingBox.getMaxX() - (width/2)) {
+		// check if on screen
+		if (position.x < 0 + (width / 2) || position.x > boundingBox.getMaxX() - (width / 2)) {
 			reset();
 			return;
 		}
@@ -172,6 +168,7 @@ void Player::update(float dt) { // dt is in seconds
 			return;
 		}
 	}
+
 	else {
 		onGround = true;
 		//Temp statement 
@@ -206,7 +203,31 @@ void Player::update(float dt) { // dt is in seconds
 		int buttonCount;
 		const unsigned char* buttons = glfwGetJoystickButtons(GLFW_JOYSTICK_1, &buttonCount);
 		const char* name = glfwGetJoystickName(GLFW_JOYSTICK_1);
+		/*
+		CCLOG("Axes Count: %d", axesCount);
+		CCLOG("Left Stick Hori: %.2f", axes[0]);
+		CCLOG("Left Stick Vert: %.2f", axes[1]);
+		CCLOG("Right Stick Hori: %.2f", axes[2]);
+		CCLOG("Right Stick Vert: %.2f", axes[3]);
+		CCLOG("Left Trigger: %.2f", axes[4]);
+		CCLOG("Right Trigger: %.2f", axes[5]);
 
+		CCLOG("Button Count: %d", buttonCount);
+		CCLOG("A: %d", buttons[0] == GLFW_PRESS);
+		CCLOG("B: %d", buttons[1] == GLFW_PRESS);
+		CCLOG("X: %d", buttons[2] == GLFW_PRESS);
+		CCLOG("Y: %d", buttons[3] == GLFW_PRESS);
+		CCLOG("LB: %d", buttons[4] == GLFW_PRESS);
+		CCLOG("RB: %d", buttons[5] == GLFW_PRESS);
+		CCLOG("Select: %d", buttons[6] == GLFW_PRESS);
+		CCLOG("Start: %d", buttons[7] == GLFW_PRESS);
+		CCLOG("LS: %d", buttons[8] == GLFW_PRESS);
+		CCLOG("RS: %d", buttons[9] == GLFW_PRESS);
+		CCLOG("UP: %d", buttons[10] == GLFW_PRESS);
+		CCLOG("RT: %d", buttons[11] == GLFW_PRESS);
+		CCLOG("DN: %d", buttons[12] == GLFW_PRESS);
+		CCLOG("LF: %d", buttons[13] == GLFW_PRESS);
+		*/
 		//Moving right
 		if (axes[LS_HORI] > .15) {
 			acceleration.x = 3 * axes[0];
@@ -228,7 +249,7 @@ void Player::update(float dt) { // dt is in seconds
 				playerSprite->runAction(walking);
 				playerSprite->setScaleX(-SPRITE_SCALE);
 				playerSprite->setScaleY(SPRITE_SCALE);
-				//playerSprite->setScaleX(-0.3);
+				//playerSprite->setScaleX(-0.3);	
 				//playerSprite->setScaleY(0.3);
 			}
 
@@ -238,16 +259,14 @@ void Player::update(float dt) { // dt is in seconds
 		}
 		if (buttons[A] == GLFW_PRESS) {
 			if (canJump) {
-				//stop the old jump sound effect to avoid stacking together
+				//stop the old jump sound effect to avoid stacking together	
 				AudioEngine::stop(jump_id);
-				//preload and play the jump mp3
+				//preload and play the jump mp3	
 				AudioEngine::preload("audio/jump.mp3");
 				jump_id = AudioEngine::play2d("audio/jump.mp3", false, 1.0f);
-
 				acceleration.y += 200;
 				canJump = false;
 				if (playerSprite->getActionByTag(JUMP_TAG) == nullptr) {
-					jumping->setTag(JUMP_TAG);
 					playerSprite->runAction(jumping);
 					playerSprite->setScale(SPRITE_SCALE);
 					//playerSprite->setScale(0.3);
@@ -264,10 +283,9 @@ void Player::update(float dt) { // dt is in seconds
 		if (buttons[Y] == GLFW_PRESS) {
 			isAttacking = true;
 			attackButtonPressed = true;
-
-			//stopping the last attack mp3 to avoid stacking the sound effects
+			//stopping the last attack mp3 to avoid stacking the sound effects	
 			AudioEngine::stop(attack_miss_id);
-			//preload and then play the attack mp3
+			//preload and then play the attack mp3	
 			AudioEngine::preload("audio/attack_miss.mp3");
 			attack_miss_id = AudioEngine::play2d("audio/attack_miss.mp3", false, 1.0f);
 		}
@@ -280,7 +298,32 @@ void Player::update(float dt) { // dt is in seconds
 			int buttonCount;
 			const unsigned char* buttons = glfwGetJoystickButtons(GLFW_JOYSTICK_2, &buttonCount);
 			const char* name = glfwGetJoystickName(GLFW_JOYSTICK_2);
-			
+			/*
+			CCLOG("Axes Count: %d", axesCount);
+			CCLOG("Left Stick Hori: %.2f", axes[0]);
+			CCLOG("Left Stick Vert: %.2f", axes[1]);
+			CCLOG("Right Stick Hori: %.2f", axes[2]);
+			CCLOG("Right Stick Vert: %.2f", axes[3]);
+			CCLOG("Left Trigger: %.2f", axes[4]);
+			CCLOG("Right Trigger: %.2f", axes[5]);
+
+			CCLOG("Button Count: %d", buttonCount);
+			CCLOG("A: %d", buttons[0] == GLFW_PRESS);
+			CCLOG("B: %d", buttons[1] == GLFW_PRESS);
+			CCLOG("X: %d", buttons[2] == GLFW_PRESS);
+			CCLOG("Y: %d", buttons[3] == GLFW_PRESS);
+			CCLOG("LB: %d", buttons[4] == GLFW_PRESS);
+			CCLOG("RB: %d", buttons[5] == GLFW_PRESS);
+			CCLOG("Select: %d", buttons[6] == GLFW_PRESS);
+			CCLOG("Start: %d", buttons[7] == GLFW_PRESS);
+			CCLOG("LS: %d", buttons[8] == GLFW_PRESS);
+			CCLOG("RS: %d", buttons[9] == GLFW_PRESS);
+			CCLOG("UP: %d", buttons[10] == GLFW_PRESS);
+			CCLOG("RT: %d", buttons[11] == GLFW_PRESS);
+			CCLOG("DN: %d", buttons[12] == GLFW_PRESS);
+			CCLOG("LF: %d", buttons[13] == GLFW_PRESS);
+			*/
+
 			if (axes[LS_HORI] > .15) {
 				orientation = 1;
 				acceleration.x = 3 * axes[0];
@@ -308,47 +351,46 @@ void Player::update(float dt) { // dt is in seconds
 			}
 		}
 	}
-		if (onGround) {
-			if (velocity.y < 0) {
-				acceleration.y = 0;
-				velocity.y = 0;
-				setFootPos(Vec2(footPos.x, int(footPos.y) + int(_CurMap->getTileSize().height) - (int(footPos.y) % int(_CurMap->getTileSize().height))));
-				canJump = true;
-			}
-			if (acceleration.x == 0) {
-				velocity.x *= .8;
-			}
-			velocity += acceleration;
+	if (onGround) {
+		if (velocity.y < 0) {
+			acceleration.y = 0;
+			velocity.y = 0;
+			setFootPos(Vec2(footPos.x, int(footPos.y) + int(_CurMap->getTileSize().height) - (int(footPos.y) % int(_CurMap->getTileSize().height))));
+			canJump = true;
 		}
-		else {
-			velocity += acceleration + gravity * dt;
+		if (acceleration.x == 0) {
+			velocity.x *= .8;
 		}
-	
-		if (orientation == 1) {
-			setAttackBox(Rect(position.x + width / 2, position.y - width / 4, width, height / 2));
-		}
-		else {
-			setAttackBox(Rect(position.x - 3 * (width / 2), position.y - width / 4, width, height / 2));
-		}
-		setHitBox(Rect(position.x - width/2, position.y - height/2, width, height));
+		velocity += acceleration;
+	}
+	else {
+		velocity += acceleration + gravity * dt;
+	}
 
-		position += velocity * dt;
-		footPos = Vec2(position.x, position.y - (height / 2));
-		playerSprite->setPosition(position);
-	
+	if (orientation == 1) {
+		setAttackBox(Rect(position.x + width / 2, position.y - width / 4, width, height / 2));
+	}
+	else {
+		setAttackBox(Rect(position.x - 3 * (width / 2), position.y - width / 4, width, height / 2));
+	}
+	setHitBox(Rect(position.x - width / 2, position.y - height / 2, width, height));
+	position += velocity * dt;
+	footPos = Vec2(position.x, position.y - (height / 2));
+	playerSprite->setPosition(position);
 }
 bool Player::hitDeathPlane(Vec2 currentPosition) {
 	Vec2 tileCoord = tileCoordForPosition(currentPosition);
 	int tileGid = _DeathPlane->getTileGIDAt(tileCoord);
 	if (tileGid) {
 		damage = 0.0;
+		playerLives -= 1;
 		return true;
 	}
 	return false;
 }
 bool Player::ComboChain(float dtF, float dtI) {
 	//Only works if the next attack input happens two seconds or less after the previous
-	if (abs(dtI-comboStartTime) < 0.05 && numTimesAttacked<=3 && attackButtonPressed) { 
+	if (abs(dtI-comboStartTime) <0.05 && numTimesAttacked<=3 && attackButtonPressed) {
 		attackButtonPressed = false;
 		numTimesAttacked += 1;
 		CCLOG("Num times attcked %u", numTimesAttacked);
@@ -376,6 +418,7 @@ void Player::setAttackBox(Rect newBox) {
 	attackBox = newBox;
 }
 
+
 void Player::setFootPos(Vec2 newPos) {
 	footPos = newPos;
 	position = Vec2(footPos.x, footPos.y + (height / 2));
@@ -397,8 +440,8 @@ bool Player::Attacked() {
 }
 
 Vec2 Player::tileCoordForPosition(Vec2 CurrentPosition) {
-	int x = CurrentPosition.x / _CurMap->getTileSize().width; // tile x coord
-	int y = ((_CurMap->getMapSize().height * _CurMap->getTileSize().height) - CurrentPosition.y) / _CurMap->getTileSize().height; // tile y coord
+	int x = CurrentPosition.x / _CurMap->getTileSize().width; // tile x coord	
+	int y = ((_CurMap->getMapSize().height * _CurMap->getTileSize().height) - CurrentPosition.y) / _CurMap->getTileSize().height; // tile y coord	
 	return cocos2d::Vec2(x, y); // return tile coords
 }
 

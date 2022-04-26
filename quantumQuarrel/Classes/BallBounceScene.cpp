@@ -24,6 +24,7 @@
 
 #include "BallBounceScene.h"
 
+
 USING_NS_CC;
 
 Scene* BallBounce::createScene()
@@ -77,6 +78,7 @@ bool BallBounce::init()
 	return true;
 }
 
+
 void BallBounce::update(float dt) {
 	//CCLOG("Player Position %f", playerOne->position.y);
 	//CCLOG("Enemy Position %f", playerTwo->position.y);
@@ -86,6 +88,7 @@ void BallBounce::update(float dt) {
 	dtF+= dt;
 	playerOne->update(dt);
 	playerTwo->update(dt);
+	playerWon();
 
 	if (playerOne->beginComboChain) {
 		if (!playerOne->ComboChain(dtF, dtI)) {
@@ -128,12 +131,6 @@ void BallBounce::update(float dt) {
 		
 	}
 	if (playerTwo->Attacked()) {
-		if (playerTwo->orientation == 1) {
-			playerTwo->setAttackBox(Rect(playerTwo->position.x + 10, playerTwo->position.y, 10, 10));
-		}
-		else {
-			playerTwo->setAttackBox(Rect(playerTwo->position.x - 10, playerTwo->position.y, 10, 10));
-		}
 		if (checkForCollision(playerTwo->attackBox, playerOne->hitBox)) {
 			if (playerTwo->onGround) {
 				if (!playerTwo->onCooldown) {
@@ -157,16 +154,16 @@ void BallBounce::update(float dt) {
 	// For debugging purposes
 	if (debugMode) {
 		node->clear();
-		//players
-		//hitboxes
+		//players	
+		//hitboxes	
 		drawBox(node, playerOne->hitBox, Color4F::WHITE);
 		drawBox(node, playerTwo->hitBox, Color4F::BLUE);
-		//attackboxes
+		//attackboxes	
 		drawBox(node, playerOne->attackBox, Color4F::WHITE);
-		drawBox(node, playerTwo->attackBox, Color4F::BLUE);	
+		drawBox(node, playerTwo->attackBox, Color4F::BLUE);
 		node->drawPoint(playerOne->footPos, 5, Color4F::WHITE);
 		node->drawPoint(playerTwo->footPos, 5, Color4F::BLUE);
-		//tiles
+		//tiles	
 		/*
 		auto winWidth = _MainMap->getMapSize().width;
 		auto winHeight = _MainMap->getMapSize().height;
@@ -179,8 +176,23 @@ void BallBounce::update(float dt) {
 		}
 		*/
 	}
-	
-	
+}
+
+void BallBounce::playerWon() {
+	if (playerOne->playerLives <= 0) {
+		toPostGameScene(2); // player 2 wins
+	}
+	else if (playerTwo->playerLives <= 0) {
+		toPostGameScene(1); // Player 1 wins
+	}
+}
+void BallBounce::toPostGameScene(int playerWon) {
+	auto postGame = PostGameScene::createScene(playerWon);
+	Director::getInstance()->replaceScene(postGame);
+}
+void BallBounce::toMainMenu() {
+		auto mainMenu = MainMenu::createScene(true);
+		Director::getInstance()->replaceScene(mainMenu);
 }
 
 void BallBounce::setViewPointCenter(Vec2 Position) {
@@ -222,7 +234,6 @@ void BallBounce::drawBox(DrawNode* node, Vec2 bottomLeft, Vec2 topRight) {
 	node->drawLine(Vec2(bottomLeft.x, bottomLeft.y + height), Vec2(topRight.x, topRight.y - height), Color4F::RED);
 	node->drawRect(Vec2(bottomLeft.x, bottomLeft.y), Vec2(topRight.x, topRight.y), Color4F::RED);
 }
-
 void BallBounce::drawBox(DrawNode* node, Rect rectangle, Color4F color) {
 	auto bottomLeft = Vec2(rectangle.getMinX(), rectangle.getMinY());
 	auto topRight = Vec2(rectangle.getMaxX(), rectangle.getMaxY());

@@ -22,7 +22,6 @@ public:
 	void setAttackBox(Rect);
 	void setFootPos(Vec2);
 	void reset();
-
 	bool ComboChain(float dtF, float dtI);
 	int numTimesAttacked;
 	float comboStartTime;
@@ -73,7 +72,6 @@ public:
 	float radius;
 	float height;
 	float width;
-
 	int attack_miss_id;
 	int attack_hit_id;
 	int jump_id;

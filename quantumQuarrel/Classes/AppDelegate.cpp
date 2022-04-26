@@ -110,7 +110,7 @@ bool AppDelegate::applicationDidFinishLaunching() {
 
 	// create a scene. it's an autorelease object
 	auto scene = BallBounce::createScene();
-	auto main = MainMenu::createScene();
+	auto main = MainMenu::createScene(true);
 
 	// run
 	director->runWithScene(main);

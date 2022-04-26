@@ -27,6 +27,8 @@
 
 #include "cocos2d.h"
 #include "Player.h"
+#include "MainMenu.h"
+#include "PostGameScene.h"
 using namespace cocos2d;
 class BallBounce : public cocos2d::Scene
 {
@@ -42,6 +44,10 @@ public:
 	
 	bool checkForCollision(Rect Attacker, Rect Reciver); // Checks for collision between the attacker's hit box, and the other player's bounding box
 	void calculateKnockback(Player* Reciver, Player* Attacker); // Caclulates the knockback of the reciver based on the orientation of the attacker
+	void toMainMenu();
+	void toPostGameScene(int playerWon);
+	void playerWon();
+	
 
 	int gravity;
 
@@ -67,6 +73,7 @@ public:
 	void drawBox(DrawNode* node, Vec2 bottomLeft, Vec2 topRight);
 	void drawBox(DrawNode* node, Rect rectangle, Color4F color);
 };
+
 
 
 #endif // __BALLBOUNCE_SCENE_H__

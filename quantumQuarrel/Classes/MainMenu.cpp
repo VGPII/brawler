@@ -28,7 +28,9 @@
 
 USING_NS_CC;
 
-Scene* MainMenu::createScene() {
+bool previbuttonPressed;
+Scene* MainMenu::createScene(bool prevbutton=false) {
+    previbuttonPressed = prevbutton;
 	auto scene = Scene::create();
 	auto layer = MainMenu::create();
 	scene->addChild(layer);
@@ -39,6 +41,7 @@ bool MainMenu::init() {
 	if (!Scene::init()) {
 		return false;
 	}
+    buttonCooldown = previbuttonPressed;
     //Initializing all of the sprites and background
     deadZone = 0.1;
     cursorPosition = 1;
@@ -82,8 +85,8 @@ bool MainMenu::init() {
 	this->addChild(Options2);
 
     this->scheduleUpdate();
+    int background_id = AudioEngine::play2d("audio/background.mp3", true, 0.5f);
 
-	int background_id = AudioEngine::play2d("audio/background.mp3", true, 0.5f);
 
     schedule(CC_SCHEDULE_SELECTOR(MainMenu::getControllerInput), 0.1f, kRepeatForever, 0); // get controller input every 0.1 seconds
 	return true;
@@ -94,18 +97,19 @@ void MainMenu::update(float dt) {
     if (menuItemSelected) {
         ExitMainMenu();
     }
-
 }
 void MainMenu::ExitMainMenu() {
-    if (cursorPosition == 1) {
-        //Load main Game
-		AudioEngine::stopAll();
-		intro_id = AudioEngine::play2d("audio/intro.mp3", false, 1.0f);
-        auto mainGame =  BallBounce::createScene();
-        Director::getInstance()->replaceScene(mainGame);
-    }
-    if (cursorPosition == 2) {
-        //Load Options Menu (Not working right now)
+    if (!buttonCooldown) {
+        if (cursorPosition == 1) {
+            //Load main Game
+            AudioEngine::stopAll();
+            intro_id = AudioEngine::play2d("audio/intro.mp3", false, 1.0f);
+            auto mainGame = BallBounce::createScene();
+            Director::getInstance()->replaceScene(mainGame);
+        }
+        if (cursorPosition == 2) {
+            //Load Options Menu (Not working right now)
+        }
     }
 }
 void MainMenu::getControllerInput(float dt) {
@@ -132,6 +136,10 @@ void MainMenu::getControllerInput(float dt) {
         }
         if (buttons[0] == 1) {
             menuItemSelected = true;
+        }
+        if (buttons[0] == 0) {
+            menuItemSelected = false;
+            buttonCooldown = false;
         }
     }
 }
