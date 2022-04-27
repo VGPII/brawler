@@ -40,16 +40,19 @@ bool PostGameScene::init() {
 		return false;
 	}
 	if (playerText == 1) {
-		auto label1 = Label::createWithTTF("Player 1 wins", "fonts/arial.ttf", 36, Size::ZERO, TextHAlignment::LEFT, TextVAlignment::TOP);//Create label
-		CCLOG("Player 1 Wins");
+		auto label1 = Label::createWithSystemFont("Player 2 wins", "Arial", 96);
+		label1->setAnchorPoint(cocos2d::Vec2(0.0, 0.0));
+		this->addChild(label1, 1);
 	}
 	else {
 		CCLOG("Player 2 Wins");
-		auto label1 = Label::createWithTTF("Player 2 wins", "fonts/arial.ttf", 36, Size::ZERO, TextHAlignment::LEFT, TextVAlignment::TOP);//Create label
+		auto label1 = Label::createWithSystemFont("Player 2 wins", "Arial", 96);
+		label1->setAnchorPoint(cocos2d::Vec2(0.0, 0.0));
+		this->addChild(label1, 1);
 	}
 	CCLOG("Press A to return to the Main Menu");
 	scheduleUpdate();
-	return true;
+	return true; 
 }
 void PostGameScene::update(float dt) {
 	getControllerInput(dt);

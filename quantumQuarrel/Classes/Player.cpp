@@ -25,10 +25,12 @@ USING_NS_CC;
 #define DN 12
 #define LF 13
 #define JUMP_TAG 3
+#define ATTACK_TAG 2
 #define WALK_TAG 1
 #define IDLE_TAG 0
 #define NULL_TAG -1
 #define SPRITE_SCALE 0.2	
+
 bool Player::init(int gravStrength, TMXTiledMap* initMap, Rect initBoundingBox, int playerNumberInit)
 {
 	boundingBox = initBoundingBox;
@@ -36,9 +38,12 @@ bool Player::init(int gravStrength, TMXTiledMap* initMap, Rect initBoundingBox, 
 	_background = _CurMap->getLayer("Background");
 	_ground = _CurMap->getLayer("Collision");
 	_DeathPlane = _CurMap->getLayer("Death_Plane");
+	//Setting number of animation frames
 	NUM_IDLE_FRAMES = 1;
 	NUM_JUMP_FRAMES = 8;
 	NUM_WALK_FRAMES = 6;
+	NUM_ATTACK_FRAMES = 7;
+
 	playerLives = 3;
 	damage = 0.0;
 	comboCooldownTime = 0.5;
@@ -90,7 +95,10 @@ bool Player::init(int gravStrength, TMXTiledMap* initMap, Rect initBoundingBox, 
 	isStuned = false;
 	isAttacking = false;
 	attackButtonPressed = false;
-	//Setting number of animation frames
+	
+
+	//start playing the background music when the map loads in	
+	background_id = AudioEngine::play2d("audio/background.mp3", true, 0.5f);
 	
 
 	return true;
@@ -108,7 +116,7 @@ void Player::loadAnimations() {
 	jumpAnimate = Animate::create(tmpAnimation);
 	jumpAnimate->retain();
 	jumping = jumpAnimate;
-	
+
 	//Loading Walking animation
 	for (int i = 1; i <= NUM_WALK_FRAMES; i++) {
 		sprintf(str, "/PlayerAnimation/walk/Walking_animation_%i.png", i);
@@ -119,7 +127,7 @@ void Player::loadAnimations() {
 	walkAnimate = Animate::create(tmpAnimation);
 	walkAnimate->retain();
 	walking = walkAnimate;
-	
+
 	//Loading idle animation
 	//Will fully implement later
 	for (int i = 1; i <= NUM_IDLE_FRAMES; i++) {
@@ -131,10 +139,16 @@ void Player::loadAnimations() {
 	idleAnimate = Animate::create(tmpAnimation);
 	idleAnimate->retain();
 	idling = idleAnimate;
-	//start playing the background music when the map loads in	
-	background_id = AudioEngine::play2d("audio/background.mp3", true, 0.5f);
 
-
+	for (int i = 1; i < NUM_ATTACK_FRAMES; i++) {
+		sprintf(str, "/PlayerAnimation/attack/Punching_Animation_rough_%i.png", i);
+		auto frame = SpriteFrame::create(str, Rect(position.x, position.y, 225, 284), false, Vec2(0, 0), Size(225, 284));
+		attackAnimation.pushBack(frame);
+	}
+	tmpAnimation = Animation::createWithSpriteFrames(attackAnimation, 0.09f);
+	attackAnimate = Animate::create(tmpAnimation);
+	attackAnimate->retain();
+	attacking = attackAnimate;
 }
 
 void Player::update(float dt) { // dt is in seconds
@@ -181,7 +195,7 @@ void Player::update(float dt) { // dt is in seconds
 				if (playerSprite->getActionByTag(IDLE_TAG) == nullptr) {
 					idling->setTag(IDLE_TAG);
 					playerSprite->runAction(idling);
-				}
+				}	
 
 			}
 		}
@@ -235,7 +249,8 @@ void Player::update(float dt) { // dt is in seconds
 			if (playerSprite->getActionByTag(1) == nullptr) {
 				walking->setTag(WALK_TAG);
 				playerSprite->runAction(walking);
-				playerSprite->setScaleX(SPRITE_SCALE);
+				playerSprite->setScaleX(SPRITE_SCALE*orientation);
+				playerSprite->setScaleY(SPRITE_SCALE);
 				//playerSprite->setScale(0.3);
 			}
 		}
@@ -247,12 +262,11 @@ void Player::update(float dt) { // dt is in seconds
 			if (playerSprite->getActionByTag(1) == nullptr) {
 				walking->setTag(WALK_TAG);
 				playerSprite->runAction(walking);
-				playerSprite->setScaleX(-SPRITE_SCALE);
+				playerSprite->setScaleX(SPRITE_SCALE*orientation);
 				playerSprite->setScaleY(SPRITE_SCALE);
 				//playerSprite->setScaleX(-0.3);	
 				//playerSprite->setScaleY(0.3);
 			}
-
 		}
 		else {
 			acceleration.x = 0;
@@ -267,8 +281,10 @@ void Player::update(float dt) { // dt is in seconds
 				acceleration.y += 200;
 				canJump = false;
 				if (playerSprite->getActionByTag(JUMP_TAG) == nullptr) {
+					jumping->setTag(JUMP_TAG);
 					playerSprite->runAction(jumping);
-					playerSprite->setScale(SPRITE_SCALE);
+					playerSprite->setScaleY(SPRITE_SCALE);
+					playerSprite->setScaleX(SPRITE_SCALE*orientation);
 					//playerSprite->setScale(0.3);
 				}
 
@@ -288,7 +304,14 @@ void Player::update(float dt) { // dt is in seconds
 			//preload and then play the attack mp3	
 			AudioEngine::preload("audio/attack_miss.mp3");
 			attack_miss_id = AudioEngine::play2d("audio/attack_miss.mp3", false, 1.0f);
+			if (playerSprite->getActionByTag(ATTACK_TAG) == nullptr) {
+				attacking->setTag(ATTACK_TAG);
+				playerSprite->runAction(attacking);
+				playerSprite->setScaleX(0.6 * orientation);
+				playerSprite->setScaleY(0.6);
+			}
 		}
+		
 	}
 }
 	if (presentP2) {

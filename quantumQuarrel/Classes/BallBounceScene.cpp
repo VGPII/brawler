@@ -75,6 +75,7 @@ bool BallBounce::init()
 	this->addChild(node);
 
 
+
 	return true;
 }
 
@@ -187,6 +188,7 @@ void BallBounce::playerWon() {
 	}
 }
 void BallBounce::toPostGameScene(int playerWon) {
+	AudioEngine::stopAll();
 	auto postGame = PostGameScene::createScene(playerWon);
 	Director::getInstance()->replaceScene(postGame);
 }

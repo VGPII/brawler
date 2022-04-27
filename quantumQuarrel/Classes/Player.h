@@ -36,6 +36,9 @@ public:
 	Vector<SpriteFrame*> idleAnimation;
 	Animate* idleAnimate;
 	int NUM_IDLE_FRAMES;
+	int NUM_ATTACK_FRAMES;
+	Vector<SpriteFrame*> attackAnimation;
+	Animate* attackAnimate;
 	Vec2 tileCoordForPosition(Vec2 position); // Converting pixel values to x,y coordinates on the tilemap
 	Rect boundingBox;
 	TMXLayer* _background;
@@ -47,6 +50,7 @@ public:
 	Action* walking; // tag =1
 	Action* jumping;// tag = 3
 	Action* idling;// tag = 0
+	Action* attacking; //tag =2
 	float damage;
 	float comboCooldown;
 	float comboCooldownTime;
