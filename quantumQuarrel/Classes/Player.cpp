@@ -64,6 +64,7 @@ bool Player::init(int gravStrength, TMXTiledMap* initMap, Rect initBoundingBox, 
 		ValueMap spawnPoint = objectGroup->getObject("SpawnPointP1");
 		Spawnpoint = Vec2(spawnPoint.at("x").asInt() * _CurMap->getScaleX(), spawnPoint.at("y").asInt()* _CurMap->getScaleY());
 		orientation = 1; // Facing towards the right side of the screen
+		playerSprite->setColor(Color3B::BLUE);
 		//Will need a loop to instantiate all of the animation types
 		loadAnimations();
 	}
@@ -71,7 +72,7 @@ bool Player::init(int gravStrength, TMXTiledMap* initMap, Rect initBoundingBox, 
 		ValueMap spawnPoint = objectGroup->getObject("SpawnPointP2");
 		Spawnpoint = Vec2(spawnPoint.at("x").asInt() * _CurMap->getScaleX(), spawnPoint.at("y").asInt() * _CurMap->getScaleY());
 		orientation = -1; // Facing towards the left side of the screen
-		playerSprite = Sprite::create("ball_blue.png");
+		playerSprite->setColor(Color3B::RED);
 
 	}
 	position = Spawnpoint;
@@ -152,6 +153,7 @@ void Player::loadAnimations() {
 }
 
 void Player::update(float dt) { // dt is in seconds
+
 	isAttacking = false;
 	if (isStuned) {
 		velocity = Vec2(0, 0);
@@ -400,6 +402,7 @@ void Player::update(float dt) { // dt is in seconds
 	position += velocity * dt;
 	footPos = Vec2(position.x, position.y - (height / 2));
 	playerSprite->setPosition(position);
+
 }
 bool Player::hitDeathPlane(Vec2 currentPosition) {
 	Vec2 tileCoord = tileCoordForPosition(currentPosition);
