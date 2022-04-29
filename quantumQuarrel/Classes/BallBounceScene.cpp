@@ -221,9 +221,10 @@ bool BallBounce::checkForCollision(Rect Attacker, Rect Reciver) {
 	return false;
 }
 void BallBounce::calculateKnockback(Player* Reciver, Player* Attacker) {
-	Reciver->acceleration.x += (50* Attacker->orientation * Reciver->damage);
+	Reciver->isStuned = false;
+	Reciver->acceleration.x +=  Attacker->orientation *(50+ Reciver->damage);
 	if (Reciver->position.y >= Attacker->position.y) {
-		Reciver->acceleration.y += 50;
+		Reciver->acceleration.y += 80;
 	}
 	else {
 		Reciver->acceleration.y -= 50;

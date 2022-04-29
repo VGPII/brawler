@@ -39,18 +39,24 @@ bool PostGameScene::init() {
 	if (!Scene::init()) {
 		return false;
 	}
+	winSize = cocos2d::Director::getInstance()->getVisibleSize();
 	if (playerText == 1) {
-		auto label1 = Label::createWithSystemFont("Player 2 wins", "Arial", 96);
-		label1->setAnchorPoint(cocos2d::Vec2(0.0, 0.0));
+		auto label1 = Label::createWithSystemFont("Player 1 wins", "Arial", 96);
+		label1->setAnchorPoint(cocos2d::Vec2(0,0));
+		label1->setPosition(cocos2d::Vec2(winSize.width / 4, winSize.height / 2));
 		this->addChild(label1, 1);
 	}
 	else {
 		CCLOG("Player 2 Wins");
 		auto label1 = Label::createWithSystemFont("Player 2 wins", "Arial", 96);
-		label1->setAnchorPoint(cocos2d::Vec2(0.0, 0.0));
+		label1->setAnchorPoint(cocos2d::Vec2(0, 0));
+		label1->setPosition(cocos2d::Vec2(winSize.width / 4, winSize.height / 2));
 		this->addChild(label1, 1);
 	}
-	CCLOG("Press A to return to the Main Menu");
+	auto label2 = Label::createWithSystemFont("Press A/B to return to the Main Menu", "Arial", 50);
+	label2->setAnchorPoint(cocos2d::Vec2(0,0));
+	label2->setPosition(cocos2d::Vec2(winSize.width / 8, winSize.height / 4));
+	this->addChild(label2, 1);
 	scheduleUpdate();
 	return true; 
 }

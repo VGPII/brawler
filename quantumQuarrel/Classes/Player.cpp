@@ -64,8 +64,8 @@ bool Player::init(int gravStrength, TMXTiledMap* initMap, Rect initBoundingBox, 
 		ValueMap spawnPoint = objectGroup->getObject("SpawnPointP1");
 		Spawnpoint = Vec2(spawnPoint.at("x").asInt() * _CurMap->getScaleX(), spawnPoint.at("y").asInt()* _CurMap->getScaleY());
 		orientation = 1; // Facing towards the right side of the screen
-		playerSprite->setColor(Color3B::BLUE);
 		//Will need a loop to instantiate all of the animation types
+		playerSprite->setColor(Color3B::BLUE);
 		loadAnimations();
 	}
 	else if (playerNumber == 2) {
@@ -73,8 +73,10 @@ bool Player::init(int gravStrength, TMXTiledMap* initMap, Rect initBoundingBox, 
 		Spawnpoint = Vec2(spawnPoint.at("x").asInt() * _CurMap->getScaleX(), spawnPoint.at("y").asInt() * _CurMap->getScaleY());
 		orientation = -1; // Facing towards the left side of the screen
 		playerSprite->setColor(Color3B::RED);
-
+		playerSprite->setScaleX(-1 * SPRITE_SCALE);
+		loadAnimations();
 	}
+	
 	position = Spawnpoint;
 	velocity = cocos2d::Vec2(0, 0);
 	acceleration = cocos2d::Vec2(0, 0);
@@ -153,7 +155,6 @@ void Player::loadAnimations() {
 }
 
 void Player::update(float dt) { // dt is in seconds
-
 	isAttacking = false;
 	if (isStuned) {
 		velocity = Vec2(0, 0);
@@ -188,19 +189,18 @@ void Player::update(float dt) { // dt is in seconds
 	else {
 		onGround = true;
 		//Temp statement 
-		if (playerNumber == 1) {
-			playerSprite->stopActionByTag(JUMP_TAG);
-			jumping->setTag(NULL_TAG);
-			if (velocity.x == 0 && acceleration.x == 0) {
-				playerSprite->stopActionByTag(WALK_TAG);
-				walking->setTag(NULL_TAG);
-				if (playerSprite->getActionByTag(IDLE_TAG) == nullptr) {
-					idling->setTag(IDLE_TAG);
-					playerSprite->runAction(idling);
-				}	
+		playerSprite->stopActionByTag(JUMP_TAG);
+		jumping->setTag(NULL_TAG);
+		if (velocity.x == 0 && acceleration.x == 0) {
+			playerSprite->stopActionByTag(WALK_TAG);
+			walking->setTag(NULL_TAG);
+			if (playerSprite->getActionByTag(IDLE_TAG) == nullptr) {
+				idling->setTag(IDLE_TAG);
+				playerSprite->runAction(idling);
+			}	
 
-			}
 		}
+	
 	}
 	int presentP1 = 0;
 	int presentP2 = 0;
@@ -271,7 +271,7 @@ void Player::update(float dt) { // dt is in seconds
 			}
 		}
 		else {
-			acceleration.x = 0;
+			acceleration.x*= 0.1;
 		}
 		if (buttons[A] == GLFW_PRESS) {
 			if (canJump) {
@@ -349,30 +349,74 @@ void Player::update(float dt) { // dt is in seconds
 			CCLOG("LF: %d", buttons[13] == GLFW_PRESS);
 			*/
 
-			if (axes[LS_HORI] > .15) {
+			//Moving right
+			if (axes[LS_HORI] > .2) {
+				acceleration.x = 3 * axes[0];
 				orientation = 1;
-				acceleration.x = 3 * axes[0];
+				if (playerSprite->getActionByTag(1) == nullptr) {
+					walking->setTag(WALK_TAG);
+					playerSprite->runAction(walking);
+					playerSprite->setScaleX(SPRITE_SCALE * orientation);
+					playerSprite->setScaleY(SPRITE_SCALE);
+					//playerSprite->setScale(0.3);
+				}
 			}
-			if (axes[LS_HORI] < -.15) {
-				orientation = -1;
+
+			//Moving Left
+			else if (axes[LS_HORI] < -.2) {
 				acceleration.x = 3 * axes[0];
+				orientation = -1;
+				if (playerSprite->getActionByTag(1) == nullptr) {
+					walking->setTag(WALK_TAG);
+					playerSprite->runAction(walking);
+					playerSprite->setScaleX(SPRITE_SCALE * orientation);
+					playerSprite->setScaleY(SPRITE_SCALE);
+					//playerSprite->setScaleX(-0.3);	
+					//playerSprite->setScaleY(0.3);
+				}
+			}
+			else {
+				acceleration.x *= 0.1;
 			}
 			if (buttons[A] == GLFW_PRESS) {
 				if (canJump) {
+					//stop the old jump sound effect to avoid stacking together	
+					AudioEngine::stop(jump_id);
+					//preload and play the jump mp3	
+					AudioEngine::preload("audio/jump.mp3");
+					jump_id = AudioEngine::play2d("audio/jump.mp3", false, 1.0f);
 					acceleration.y += 200;
 					canJump = false;
+					if (playerSprite->getActionByTag(JUMP_TAG) == nullptr) {
+						jumping->setTag(JUMP_TAG);
+						playerSprite->runAction(jumping);
+						playerSprite->setScaleY(SPRITE_SCALE);
+						playerSprite->setScaleX(SPRITE_SCALE * orientation);
+						//playerSprite->setScale(0.3);
+					}
+
 				}
 			}
 			if (buttons[B] == GLFW_PRESS) {
 				if (canJump) {
 					acceleration.x = 0;
-					velocity.x *= .8;
+					velocity.x *= .5;
 				}
 			}
 			if (buttons[Y] == GLFW_PRESS) {
 				isAttacking = true;
 				attackButtonPressed = true;
-
+				//stopping the last attack mp3 to avoid stacking the sound effects	
+				AudioEngine::stop(attack_miss_id);
+				//preload and then play the attack mp3	
+				AudioEngine::preload("audio/attack_miss.mp3");
+				attack_miss_id = AudioEngine::play2d("audio/attack_miss.mp3", false, 1.0f);
+				if (playerSprite->getActionByTag(ATTACK_TAG) == nullptr) {
+					attacking->setTag(ATTACK_TAG);
+					playerSprite->runAction(attacking);
+					playerSprite->setScaleX(0.6 * orientation);
+					playerSprite->setScaleY(0.6);
+				}
 			}
 		}
 	}
@@ -402,7 +446,6 @@ void Player::update(float dt) { // dt is in seconds
 	position += velocity * dt;
 	footPos = Vec2(position.x, position.y - (height / 2));
 	playerSprite->setPosition(position);
-
 }
 bool Player::hitDeathPlane(Vec2 currentPosition) {
 	Vec2 tileCoord = tileCoordForPosition(currentPosition);

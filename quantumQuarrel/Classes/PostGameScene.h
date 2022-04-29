@@ -42,6 +42,7 @@ public:
 	void update(float dt);
 	void updateMenu();
 	void getControllerInput(float dt);
+	Size winSize;
 	void ExitScene();
 	bool menuItemSelected;
 	bool controllerPresence;
