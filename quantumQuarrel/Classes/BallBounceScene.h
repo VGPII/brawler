@@ -29,6 +29,8 @@
 #include "Player.h"
 #include "MainMenu.h"
 #include "PostGameScene.h"
+#include "fmod.hpp"
+#pragma once
 using namespace cocos2d;
 class BallBounce : public cocos2d::Scene
 {

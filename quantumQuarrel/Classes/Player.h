@@ -1,4 +1,10 @@
+#ifndef __PLAYER_H__
+#define __PLAYER_H__
+
 #include "cocos2d.h"
+#include "fmod.hpp"
+#include "AudioManager.h"
+#pragma once
 using namespace cocos2d;
 
 class Player
@@ -76,10 +82,15 @@ public:
 	float radius;
 	float height;
 	float width;
-	int attack_miss_id;
-	int attack_hit_id;
-	int jump_id;
-	int death_id;
-	int background_id;
-
+	FMOD::System *system;
+	FMOD::Sound *background_sound;
+	FMOD::Sound *death_sound;
+	FMOD::Sound *jump_sound;
+	FMOD::Sound *attack_sound;
+	FMOD::Channel *background_channel;
+	FMOD::Channel *death_channel;
+	FMOD::Channel *attack_channel;
+	FMOD::Channel *jump_channel;
+	AudioManager sound_vol;
 };
+#endif // __PLAYER_H__

@@ -1,5 +1,6 @@
 #include "Player.h"
-#include "AudioEngine.h"
+#include "AudioManager.h"
+#include "fmod.hpp"
 
 USING_NS_CC;
 
@@ -100,9 +101,10 @@ bool Player::init(int gravStrength, TMXTiledMap* initMap, Rect initBoundingBox, 
 	attackButtonPressed = false;
 	
 
-	//start playing the background music when the map loads in	
-	background_id = AudioEngine::play2d("audio/background.mp3", true, 0.5f);
-	
+	//initialize the sound system, this is where the volume level is set from the options menu, for now it is hard coded at 0.5f
+	sound_vol.setVolume(0.5f);
+	FMOD::System_Create(&system);
+	system->init(32, FMOD_INIT_NORMAL, nullptr);
 
 	return true;
 }
@@ -161,6 +163,16 @@ void Player::update(float dt) { // dt is in seconds
 		acceleration = Vec2(0, 0);
 	}
 	if (hitDeathPlane(position)) {
+		//stop any old death audio to avoid stacking sounds.
+		death_channel->stop();
+		//file path
+		std::string death_path = FileUtils::getInstance()->fullPathForFilename("audio/death.wav");
+		//create sound and set the volume to whatever the volume level is set to
+		system->createSound(death_path.c_str(), FMOD_LOOP_OFF, 0, &death_sound);
+		system->playSound(death_sound, 0, true, &death_channel);
+		death_channel->setVolume(sound_vol.getVolume());
+		//play the sound
+		death_channel->setPaused(false);
 		reset();
 		return;
 	}
@@ -275,11 +287,17 @@ void Player::update(float dt) { // dt is in seconds
 		}
 		if (buttons[A] == GLFW_PRESS) {
 			if (canJump) {
-				//stop the old jump sound effect to avoid stacking together	
-				AudioEngine::stop(jump_id);
-				//preload and play the jump mp3	
-				AudioEngine::preload("audio/jump.mp3");
-				jump_id = AudioEngine::play2d("audio/jump.mp3", false, 1.0f);
+				//stop previous jump sounds
+				jump_channel->stop();
+				//file path
+				std::string jump_path = FileUtils::getInstance()->fullPathForFilename("audio/jump.wav");
+				//create the sound, initted as paused
+				system->createSound(jump_path.c_str(), FMOD_LOOP_OFF, 0, &jump_sound);
+				system->playSound(jump_sound, 0, true, &jump_channel);
+				//set volume
+				jump_channel->setVolume(sound_vol.getVolume());
+				//unpaused and play sound
+				jump_channel->setPaused(false);
 				acceleration.y += 200;
 				canJump = false;
 				if (playerSprite->getActionByTag(JUMP_TAG) == nullptr) {
@@ -301,11 +319,17 @@ void Player::update(float dt) { // dt is in seconds
 		if (buttons[Y] == GLFW_PRESS) {
 			isAttacking = true;
 			attackButtonPressed = true;
-			//stopping the last attack mp3 to avoid stacking the sound effects	
-			AudioEngine::stop(attack_miss_id);
-			//preload and then play the attack mp3	
-			AudioEngine::preload("audio/attack_miss.mp3");
-			attack_miss_id = AudioEngine::play2d("audio/attack_miss.mp3", false, 1.0f);
+			//stop old attack sounds
+			attack_channel->stop();
+			//file path
+			std::string attack_path = FileUtils::getInstance()->fullPathForFilename("audio/attack_miss.wav");
+			//create sound
+			system->createSound(attack_path.c_str(), FMOD_LOOP_OFF, 0, &attack_sound);
+			system->playSound(attack_sound, 0, true, &attack_channel);
+			//set volume
+			attack_channel->setVolume(sound_vol.getVolume());
+			//play
+			attack_channel->setPaused(false);
 			if (playerSprite->getActionByTag(ATTACK_TAG) == nullptr) {
 				attacking->setTag(ATTACK_TAG);
 				playerSprite->runAction(attacking);
@@ -380,11 +404,17 @@ void Player::update(float dt) { // dt is in seconds
 			}
 			if (buttons[A] == GLFW_PRESS) {
 				if (canJump) {
-					//stop the old jump sound effect to avoid stacking together	
-					AudioEngine::stop(jump_id);
-					//preload and play the jump mp3	
-					AudioEngine::preload("audio/jump.mp3");
-					jump_id = AudioEngine::play2d("audio/jump.mp3", false, 1.0f);
+					//stop old sound
+					jump_channel->stop();
+					//file path
+					std::string jump_path = FileUtils::getInstance()->fullPathForFilename("audio/jump.wav");
+					//create sound
+					system->createSound(jump_path.c_str(), FMOD_LOOP_OFF, 0, &jump_sound);
+					system->playSound(jump_sound, 0, true, &jump_channel);
+					//set volume
+					jump_channel->setVolume(sound_vol.getVolume());
+					//play
+					jump_channel->setPaused(false);
 					acceleration.y += 200;
 					canJump = false;
 					if (playerSprite->getActionByTag(JUMP_TAG) == nullptr) {
@@ -406,11 +436,17 @@ void Player::update(float dt) { // dt is in seconds
 			if (buttons[Y] == GLFW_PRESS) {
 				isAttacking = true;
 				attackButtonPressed = true;
-				//stopping the last attack mp3 to avoid stacking the sound effects	
-				AudioEngine::stop(attack_miss_id);
-				//preload and then play the attack mp3	
-				AudioEngine::preload("audio/attack_miss.mp3");
-				attack_miss_id = AudioEngine::play2d("audio/attack_miss.mp3", false, 1.0f);
+				//stop old sound
+				attack_channel->stop();
+				//file path
+				std::string attack_path = FileUtils::getInstance()->fullPathForFilename("audio/attack_miss.wav");
+				//create sound
+				system->createSound(attack_path.c_str(), FMOD_LOOP_OFF, 0, &attack_sound);
+				system->playSound(attack_sound, 0, true, &attack_channel);
+				//set volume
+				attack_channel->setVolume(sound_vol.getVolume());
+				//play sound
+				attack_channel->setPaused(false);
 				if (playerSprite->getActionByTag(ATTACK_TAG) == nullptr) {
 					attacking->setTag(ATTACK_TAG);
 					playerSprite->runAction(attacking);

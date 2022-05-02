@@ -28,7 +28,8 @@
 
 #include "cocos2d.h"
 #include "BallBounceScene.h"
-#include "audio/include/AudioEngine.h"
+#include "fmod.hpp"
+#include "AudioManager.h"
 
 using namespace cocos2d;
 
@@ -61,8 +62,13 @@ public:
 	int NUM_OF_MENU_ITEMS = 2;
 	int previousCursorPosition;
 	bool cursorMoved;
-	int background_id;
-	int intro_id;
+
+	FMOD::System *system;
+	FMOD::Sound *background_sound;
+	FMOD::Sound *intro_sound;
+	FMOD::Channel *background_channel;
+	FMOD::Channel *intro_channel;
+	AudioManager sound_vol;
 };
 
 #endif // __MAINMENU__H__

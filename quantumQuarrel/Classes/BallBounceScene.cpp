@@ -21,10 +21,11 @@
  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  THE SOFTWARE.
  ****************************************************************************/
-
+#pragma once
 #include "BallBounceScene.h"
-
-
+#include "fmod.hpp"
+#include "MainMenu.h"
+#include "Player.h"
 USING_NS_CC;
 
 Scene* BallBounce::createScene()
@@ -188,7 +189,6 @@ void BallBounce::playerWon() {
 	}
 }
 void BallBounce::toPostGameScene(int playerWon) {
-	AudioEngine::stopAll();
 	auto postGame = PostGameScene::createScene(playerWon);
 	Director::getInstance()->replaceScene(postGame);
 }
