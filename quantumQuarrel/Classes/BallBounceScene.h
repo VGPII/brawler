@@ -29,8 +29,9 @@
 #include "Player.h"
 #include "MainMenu.h"
 #include "PostGameScene.h"
-#include "fmod.hpp"
+#include "fmod.hpp"	
 #pragma once
+
 using namespace cocos2d;
 class BallBounce : public cocos2d::Scene
 {
@@ -49,10 +50,15 @@ public:
 	void toMainMenu();
 	void toPostGameScene(int playerWon);
 	void playerWon();
+	void timer(float dt);
 	
 
 	int gravity;
-
+	int gameTime;
+	int gameTimeMins;
+	int gameTimeSecs;
+	Label* timerGUI;
+	
 	TMXTiledMap* _MainMap;
 	TMXLayer* _background;
 	TMXLayer* _ground;
@@ -74,6 +80,7 @@ public:
 	bool debugMode = false;
 	void drawBox(DrawNode* node, Vec2 bottomLeft, Vec2 topRight);
 	void drawBox(DrawNode* node, Rect rectangle, Color4F color);
+	
 };
 
 

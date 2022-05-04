@@ -11,4 +11,3 @@ public:
 		return audio_volume;
 	}
 };
-

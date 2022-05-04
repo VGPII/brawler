@@ -28,7 +28,7 @@
 
 #include "cocos2d.h"
 #include "BallBounceScene.h"
-#include "fmod.hpp"
+#include "fmod.hpp"	
 #include "AudioManager.h"
 
 using namespace cocos2d;
@@ -63,11 +63,11 @@ public:
 	int previousCursorPosition;
 	bool cursorMoved;
 
-	FMOD::System *system;
-	FMOD::Sound *background_sound;
-	FMOD::Sound *intro_sound;
-	FMOD::Channel *background_channel;
-	FMOD::Channel *intro_channel;
+	FMOD::System* system;
+	FMOD::Sound* background_sound;
+	FMOD::Sound* intro_sound;
+	FMOD::Channel* background_channel;
+	FMOD::Channel* intro_channel;
 	AudioManager sound_vol;
 };
 

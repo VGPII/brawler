@@ -21,11 +21,13 @@
  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  THE SOFTWARE.
  ****************************************************************************/
-#pragma once
+
 #include "BallBounceScene.h"
-#include "fmod.hpp"
-#include "MainMenu.h"
+#pragma once	
+#include "fmod.hpp"	
+#include "MainMenu.h"	
 #include "Player.h"
+
 USING_NS_CC;
 
 Scene* BallBounce::createScene()
@@ -51,6 +53,7 @@ bool BallBounce::init()
 
 	gravity = 400;
 	dtF = 0;
+	gameTime = 300;
 
 	_MainMap = TMXTiledMap::create("mainMap.tmx");
 	auto background = _MainMap->getLayer("Background");
@@ -60,8 +63,9 @@ bool BallBounce::init()
 	_DeathPlane->setVisible(false);
 	_MainMap->setScaleX((winSize.width / _MainMap->getContentSize().width) * 1);
 	_MainMap->setScaleY((winSize.height / _MainMap->getContentSize().height) * 1);
-
 	this->addChild(_MainMap);
+
+	
 
 	playerOne = new Player();
 	playerTwo = new Player();
@@ -71,8 +75,30 @@ bool BallBounce::init()
 
 	this->addChild(playerOne->playerSprite);
 	this->addChild(playerTwo->playerSprite);
+	this->addChild(playerOne->playerDamageIcon3);
+	this->addChild(playerOne->playerDamageIcon2);
+	this->addChild(playerOne->playerDamageIcon1);
+	this->addChild(playerOne->damageLabel);
+	
+	
+	this->addChild(playerTwo->playerDamageIcon3);
+	this->addChild(playerTwo->playerDamageIcon2);
+	this->addChild(playerTwo->playerDamageIcon1);
+	this->addChild(playerTwo->damageLabel);
 
+	//Creating the timer
+	gameTimeMins = gameTime / 60;
+	gameTimeSecs = gameTime - gameTimeMins * 60;
+	timerGUI = Label::createWithSystemFont(std::to_string(gameTimeMins) + ":" + std::to_string(gameTimeSecs)+ "0", "Arial", 20);
+	timerGUI->setAnchorPoint(cocos2d::Vec2(0, 0));
+	auto gui = _MainMap->getObjectGroup("GUI");
+	ValueMap timerPos = gui->getObject("Timer");
+	timerGUI->setPosition(Vec2(timerPos.at("x").asInt() * _MainMap->getScaleX(), timerPos.at("y").asInt() * _MainMap->getScaleY()));
+	this->addChild(timerGUI);
+
+	
 	this->scheduleUpdate();
+	schedule(CC_SCHEDULE_SELECTOR(BallBounce::timer), 1.0f, kRepeatForever, 0); // get controller input every 0.1 seconds
 	this->addChild(node);
 
 
@@ -188,13 +214,41 @@ void BallBounce::playerWon() {
 		toPostGameScene(1); // Player 1 wins
 	}
 }
+//Unloads the game and goes to the post game scene
 void BallBounce::toPostGameScene(int playerWon) {
+
 	auto postGame = PostGameScene::createScene(playerWon);
 	Director::getInstance()->replaceScene(postGame);
 }
+//Goes back to the main menu
 void BallBounce::toMainMenu() {
 		auto mainMenu = MainMenu::createScene(true);
 		Director::getInstance()->replaceScene(mainMenu);
+}
+//Countdown timer that will determine how long is left in a game (the function is called every second)
+void BallBounce::timer(float dt) {
+	//If the players run out of time, then the winner is decided by the one with the most amount of lives
+	if (gameTime <= 0) {
+		if (playerOne->playerLives > playerTwo->playerLives) {
+			toPostGameScene(1);
+		}
+		else {
+			toPostGameScene(2);
+		}
+	}
+	//Converting seconds to minutes and seconds
+	gameTimeMins = gameTime / 60;
+	gameTimeSecs = gameTime - gameTimeMins * 60;
+	
+	//Need to add an additional zero when the number of seconds is 0 for formatting.
+	if (gameTimeSecs == 0) {
+		timerGUI->setString(std::to_string(gameTimeMins) + ":" + std::to_string(gameTimeSecs)+ "0");
+	}
+	else {
+		timerGUI->setString(std::to_string(gameTimeMins) + ":" + std::to_string(gameTimeSecs));
+	}
+	gameTime -= 1.0;
+
 }
 
 void BallBounce::setViewPointCenter(Vec2 Position) {
@@ -220,15 +274,17 @@ bool BallBounce::checkForCollision(Rect Attacker, Rect Reciver) {
 	}
 	return false;
 }
+//Calculates the knockback after the user recives a hit
 void BallBounce::calculateKnockback(Player* Reciver, Player* Attacker) {
 	Reciver->isStuned = false;
-	Reciver->acceleration.x +=  Attacker->orientation *(50+ Reciver->damage);
+	Reciver->acceleration.x +=  Attacker->orientation *(75+ Reciver->damage);
 	if (Reciver->position.y >= Attacker->position.y) {
 		Reciver->acceleration.y += 80;
 	}
 	else {
 		Reciver->acceleration.y -= 50;
 	}
+	Reciver->damageLabel->setString(std::to_string(Reciver->damage).substr(0,4)+ "%");
 }
 
 void BallBounce::drawBox(DrawNode* node, Vec2 bottomLeft, Vec2 topRight) {

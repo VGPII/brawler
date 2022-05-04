@@ -24,8 +24,9 @@
 
 #include "MainMenu.h"
 #include <math.h>
-#include "fmod.hpp"
-#include "AudioManager.h"
+#include "fmod.hpp"	
+#include "AudioManager.h"	
+
 
 USING_NS_CC;
 
@@ -86,22 +87,23 @@ bool MainMenu::init() {
 	this->addChild(Options2);
 
     this->scheduleUpdate();
-    
-	//sound is hard-coded to 0.5f, but options menu will return a float based on user selection.  That value will be used in place of 0.5f
-	sound_vol.setVolume(0.5f);
-	//create and initialize fmod audio system
-	FMOD::System_Create(&system);
-	system->init(32, FMOD_INIT_NORMAL, nullptr);
-	//file path
-	std::string background_path = FileUtils::getInstance()->fullPathForFilename("audio/background.wav");
-	//create sound
-	system->createSound(background_path.c_str(), FMOD_LOOP_NORMAL, 0, &background_sound);
-	//init sound but set to pause until volume set
-	system->playSound(background_sound, 0, true, &background_channel);
-	//set volume (background music needs to be quieter, so it gets a .1f multiplier
-	background_channel->setVolume(sound_vol.getVolume() * .1f);
-	//play background music on loop
-	background_channel->setPaused(false);
+
+    //sound is hard-coded to 0.5f, but options menu will return a float based on user selection.  That value will be used in place of 0.5f	
+    sound_vol.setVolume(0.5f);
+    //create and initialize fmod audio system	
+    FMOD::System_Create(&system);
+    system->init(32, FMOD_INIT_NORMAL, nullptr);
+    //file path	
+    std::string background_path = FileUtils::getInstance()->fullPathForFilename("audio/background.wav");
+    //create sound	
+    system->createSound(background_path.c_str(), FMOD_LOOP_NORMAL, 0, &background_sound);
+    //init sound but set to pause until volume set	
+    system->playSound(background_sound, 0, true, &background_channel);
+    //set volume (background music needs to be quieter, so it gets a .1f multiplier	
+    background_channel->setVolume(sound_vol.getVolume() * .1f);
+    //play background music on loop	
+    background_channel->setPaused(false);
+
 
     schedule(CC_SCHEDULE_SELECTOR(MainMenu::getControllerInput), 0.1f, kRepeatForever, 0); // get controller input every 0.1 seconds
 	return true;
@@ -117,16 +119,16 @@ void MainMenu::ExitMainMenu() {
     if (!buttonCooldown) {
         if (cursorPosition == 1) {
             //Load main Game
-			//file path
-			std::string intro_path = FileUtils::getInstance()->fullPathForFilename("audio/intro.wav");
-			//create sound
-			system->createSound(intro_path.c_str(), FMOD_LOOP_OFF, 0, &intro_sound);
-			//sound is initialized but set to paused until volume is set
-			system->playSound(intro_sound, 0, true, &intro_channel);
-			//set volume
-			intro_channel->setVolume(sound_vol.getVolume());
-			//play (unpause) sound
-			intro_channel->setPaused(false);
+                        //file path	
+            std::string intro_path = FileUtils::getInstance()->fullPathForFilename("audio/intro.wav");
+            //create sound	
+            system->createSound(intro_path.c_str(), FMOD_LOOP_OFF, 0, &intro_sound);
+            //sound is initialized but set to paused until volume is set	
+            system->playSound(intro_sound, 0, true, &intro_channel);
+            //set volume	
+            intro_channel->setVolume(sound_vol.getVolume());
+            //play (unpause) sound	
+            intro_channel->setPaused(false);
 
             auto mainGame = BallBounce::createScene();
             Director::getInstance()->replaceScene(mainGame);

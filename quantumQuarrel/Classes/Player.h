@@ -1,10 +1,10 @@
-#ifndef __PLAYER_H__
-#define __PLAYER_H__
-
 #include "cocos2d.h"
-#include "fmod.hpp"
-#include "AudioManager.h"
+#ifndef __PLAYER_H__	
+#define __PLAYER_H__
+#include "fmod.hpp"	
+#include "AudioManager.h"	
 #pragma once
+
 using namespace cocos2d;
 
 class Player
@@ -33,6 +33,11 @@ public:
 	float comboStartTime;
 	bool beginComboChain;
 	bool endChain;
+	Sprite* playerDamageIcon3;
+	Sprite* playerDamageIcon2;
+	Sprite* playerDamageIcon1;
+
+	Label* damageLabel;
 	Vector<SpriteFrame*> JumpAnimation;
 	Animate* jumpAnimate;
 	int NUM_JUMP_FRAMES;
@@ -51,6 +56,7 @@ public:
 	TMXLayer* _ground;
 	TMXLayer* _DeathPlane;
 	TMXObjectGroup* objectGroup;
+	TMXObjectGroup* guiGroup;
 	Rect hitBox;
 	Rect attackBox;
 	Action* walking; // tag =1
@@ -82,15 +88,16 @@ public:
 	float radius;
 	float height;
 	float width;
-	FMOD::System *system;
-	FMOD::Sound *background_sound;
-	FMOD::Sound *death_sound;
-	FMOD::Sound *jump_sound;
-	FMOD::Sound *attack_sound;
-	FMOD::Channel *background_channel;
-	FMOD::Channel *death_channel;
-	FMOD::Channel *attack_channel;
-	FMOD::Channel *jump_channel;
+	FMOD::System* system;
+	FMOD::Sound* background_sound;
+	FMOD::Sound* death_sound;
+	FMOD::Sound* jump_sound;
+	FMOD::Sound* attack_sound;
+	FMOD::Channel* background_channel;
+	FMOD::Channel* death_channel;
+	FMOD::Channel* attack_channel;
+	FMOD::Channel* jump_channel;
 	AudioManager sound_vol;
+
 };
 #endif // __PLAYER_H__
