@@ -23,11 +23,11 @@
  THE SOFTWARE.
  ****************************************************************************/
 
-#ifndef __MAINMENU_H__
-#define __MAINMENU_H__
+#ifndef __OPTIONSMENU_H__
+#define __OPTIONSMENU_H__
 
 #include "cocos2d.h"
-
+#include "MainMenu.h"
 
 using namespace cocos2d;
 
@@ -38,10 +38,14 @@ public:
 	//General Methods needed for a menu
 	virtual bool init();
 	void update(float dt);
-	void updateMenu();
-	void getControllerInput(float dt);
-	void ExitMainMenu();
-	bool menuItemSelected;
+	void updateOptionsMenu();
+	void getOptionsControllerInput(float dt);
+	void exitOptionsMenu();
+
+	bool buttonCooldown;
+	float volumeValue;
+
+	bool optionsMenuItemSelected;
 	bool controllerPresence;
 	const float* axes;
 	int axesCount;
@@ -49,13 +53,30 @@ public:
 	int buttonCount;
 	float deadZone;
 	CREATE_FUNC(OptionsMenu);
+	Sprite* TitleAudio;
+	Sprite* OneBackButton;
+	Sprite* TwoBackButton;
+	Sprite* OptionMenuBackground;
+	Sprite* OneSoundBar;
+	Sprite* TwoSoundBar;
+	Sprite* ThreeSoundBar;
+	Sprite* FourSoundBar;
+	Sprite* FiveSoundBar;
+	Sprite* SixSoundBar;
+	Sprite* SevenSoundBar;
+
+	Sprite* SoundArrowLeftOne;
+	Sprite* SoundArrowLeftTwo;
+
+	Sprite* SoundArrowRightOne;
+	Sprite* SoundArrowRightTwo;
+
+	Sprite* SoundEffectsTitle;
+	int volumeCount; //was set to nothing
 	int cursorPosition;
-	int NUM_OF_MENU_ITEMS = 2;
+	int NUM_OF_OPTION_MENU_ITEMS = 3; //2 sound arrow, one back button
 	int previousCursorPosition;
 	bool cursorMoved;
 };
 
-#endif // __MAINMENU__H__
-
-
-
+#endif // __OPTIONSMENU__H__
