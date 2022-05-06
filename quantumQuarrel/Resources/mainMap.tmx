@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.8" tiledversion="1.8.2" orientation="orthogonal" renderorder="right-down" width="64" height="48" tilewidth="16" tileheight="16" infinite="0" nextlayerid="11" nextobjectid="32">
+<map version="1.8" tiledversion="1.8.2" orientation="orthogonal" renderorder="right-down" width="64" height="48" tilewidth="16" tileheight="16" infinite="0" nextlayerid="11" nextobjectid="33">
  <tileset firstgid="1" source="meta_tiles.tsx"/>
  <tileset firstgid="3" source="Background.tsx"/>
  <layer id="1" name="Background" width="64" height="48">
@@ -31,9 +31,9 @@
  <objectgroup id="3" name="SpawnPoints">
   <object id="6" name="SpawnPointP1" x="208" y="432" width="16" height="16"/>
   <object id="12" name="SpawnPointP2" x="800" y="432" width="16" height="16"/>
-  <object id="13" x="1754" y="610"/>
+  <object id="32" name="itemSpawnPoint" x="514" y="214" width="16" height="16"/>
  </objectgroup>
- <objectgroup id="10" name="GUI">
+ <objectgroup id="10" name="GUI" visible="0">
   <object id="19" name="Timer" x="832" y="70.6667" width="104" height="33.3333"/>
   <object id="24" name="Player2Damage" x="762.667" y="668" width="28" height="26.6667"/>
   <object id="25" x="1246.67" y="268"/>

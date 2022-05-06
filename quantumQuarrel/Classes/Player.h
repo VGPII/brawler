@@ -3,6 +3,7 @@
 #define __PLAYER_H__
 #include "fmod.hpp"	
 #include "AudioManager.h"	
+#include "Item.h"
 #pragma once
 
 using namespace cocos2d;
@@ -14,15 +15,16 @@ public:
 
 	virtual bool init(int gravStrength, TMXTiledMap* initMap, Rect boundingBox, int playerNumber);
 	void update(float);
-	void spawn(Vec2 pos);
-	void jump();
-	void run(float vel);
+	void setItem(Item* newItem);
 	bool InAir(Vec2 position);
 	bool hitDeathPlane(Vec2 currentPosition);
 	void loadAnimations();
 	void updateStunStatus();
 	bool isStuned;
 	bool isAttacking;
+	bool isPickingUp;
+	bool hasItem;
+	Item* item;
 	bool Attacked();
 	void setHitBox(Rect);
 	void setAttackBox(Rect);
@@ -84,7 +86,6 @@ public:
 	bool canJump;
 	bool onGround;
 	bool attackButtonPressed;
-	float maxVel = 500;
 	float radius;
 	float height;
 	float width;

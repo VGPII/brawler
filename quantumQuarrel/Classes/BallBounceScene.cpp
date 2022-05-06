@@ -27,6 +27,7 @@
 #include "fmod.hpp"	
 #include "MainMenu.h"	
 #include "Player.h"
+#include "Item.h"
 
 USING_NS_CC;
 
@@ -45,7 +46,7 @@ bool BallBounce::init()
 		return false;
 	}
 	
-	//debugMode = true; //Comment out to remove debugLines
+	debugMode = true; //Comment out to remove debugLines
 
 	winSize = cocos2d::Director::getInstance()->getWinSize();
 	node = DrawNode::create(2);
@@ -69,12 +70,17 @@ bool BallBounce::init()
 
 	playerOne = new Player();
 	playerTwo = new Player();
+	item = new Item();
+	itemSpawnCooldown = 35.0;
 
 	playerOne->init(gravity, _MainMap, this->getBoundingBox(), 1);
 	playerTwo->init(gravity, _MainMap, this->getBoundingBox(), 2);
+	item->init(gravity, RandomHelper::random_int(0, 1), _MainMap);
 
 	this->addChild(playerOne->playerSprite);
 	this->addChild(playerTwo->playerSprite);
+	this->addChild(item->itemSprite);
+	
 	this->addChild(playerOne->playerDamageIcon3);
 	this->addChild(playerOne->playerDamageIcon2);
 	this->addChild(playerOne->playerDamageIcon1);
@@ -116,7 +122,41 @@ void BallBounce::update(float dt) {
 	dtF+= dt;
 	playerOne->update(dt);
 	playerTwo->update(dt);
+	if (item != nullptr) {
+		item->update(dt);
+	}
 	playerWon();
+	if (itemSpawnCooldown <= 0) {
+		itemSpawnCooldown = 35.0;
+		item = new Item();
+		item->init(gravity, RandomHelper::random_int(0, 1), _MainMap);
+		this->addChild(item->itemSprite);
+	}
+	else {
+		itemSpawnCooldown -= dt;
+	}
+
+
+	if (item != nullptr) {
+		if (playerOne->isPickingUp) {
+			if (!item->isEquiped) {
+				if (checkForCollision(playerOne->attackBox, item->hitBox)) {
+					item->pickUp();
+					playerOne->hasItem = true;
+					playerOne->setItem(item);
+				}
+			}
+		}
+		if (playerTwo->isPickingUp) {
+			if (!item->isEquiped) {
+				if (checkForCollision(playerTwo->attackBox, item->hitBox)) {
+					item->pickUp();
+					playerTwo->hasItem = true;
+					playerTwo->setItem(item);
+				}
+			}
+		}
+	}
 
 	if (playerOne->beginComboChain) {
 		if (!playerOne->ComboChain(dtF, dtI)) {
@@ -138,13 +178,13 @@ void BallBounce::update(float dt) {
 					}
 					//Begining a combo chain on the ground
 					if (playerOne->ComboChain(dtF, dtI)) {
-						playerTwo->damage += 2.5;
+						dealDamage(playerTwo, playerOne, 2.5);
 						playerTwo->isStuned = true;
 					}
 				}
 			}
 			else {
-				playerTwo->damage += 1.2;
+				dealDamage(playerTwo, playerOne, 1.2);
 				calculateKnockback(playerTwo, playerOne);
 			}
 		}
@@ -168,17 +208,32 @@ void BallBounce::update(float dt) {
 					}
 					//Begining a combo chain on the ground
 					if (playerTwo->ComboChain(dtF, dtI)) {
-						playerOne->damage += 2.5;
+						dealDamage(playerOne, playerTwo, 2.5);
 						playerOne->isStuned = true;
 					}
 				}
 			}
 			else {
-				playerOne->damage += 1.2;
+				dealDamage(playerOne, playerTwo, 1.2);
 				calculateKnockback(playerOne, playerTwo);
 			}
 		}
 	}
+	if (item != nullptr) {
+		if (item->setToDespawn) {
+			item->itemSprite->removeFromParent();
+			if (playerOne->hasItem) {
+				playerOne->item = nullptr;
+				playerOne->hasItem = false;
+			}
+			if (playerTwo->hasItem) {
+				playerTwo->item = nullptr;
+				playerTwo->hasItem = false;
+			}
+			item = nullptr;
+		}
+	}
+
 	// For debugging purposes
 	if (debugMode) {
 		node->clear();
@@ -191,6 +246,11 @@ void BallBounce::update(float dt) {
 		drawBox(node, playerTwo->attackBox, Color4F::BLUE);
 		node->drawPoint(playerOne->footPos, 5, Color4F::WHITE);
 		node->drawPoint(playerTwo->footPos, 5, Color4F::BLUE);
+		//items
+		if (item != nullptr) {
+			drawBox(node, item->hitBox, Color4F::GREEN);
+			node->drawPoint(item->basePos, 5, Color4F::GREEN);
+		}
 		//tiles	
 		/*
 		auto winWidth = _MainMap->getMapSize().width;
@@ -285,6 +345,21 @@ void BallBounce::calculateKnockback(Player* Reciver, Player* Attacker) {
 		Reciver->acceleration.y -= 50;
 	}
 	Reciver->damageLabel->setString(std::to_string(Reciver->damage).substr(0,4)+ "%");
+}
+
+//Calculates the damage after the user recives a hit
+void BallBounce::dealDamage(Player* Reciver, Player* Attacker, float dmg) {
+	if (Attacker->hasItem) {
+		if (Attacker->item->type == 1) {
+			dmg *= 1.1;
+		}
+	}
+	if (Reciver->hasItem) {
+		if (Reciver->item->type == 0) {
+			dmg *= 0.9;
+		}
+	}
+	Reciver->damage += dmg;
 }
 
 void BallBounce::drawBox(DrawNode* node, Vec2 bottomLeft, Vec2 topRight) {

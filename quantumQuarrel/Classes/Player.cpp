@@ -55,7 +55,8 @@ bool Player::init(int gravStrength, TMXTiledMap* initMap, Rect initBoundingBox, 
 	playerNumber = playerNumberInit;
 	guiGroup = _CurMap->getObjectGroup("GUI");
 
-	
+	item = nullptr;
+
 	if (objectGroup == NULL) {
 		CCLOG("Tile map does not have an object layer");
 	}
@@ -320,13 +321,30 @@ void Player::update(float dt) { // dt is in seconds
 		presentP2 = glfwJoystickPresent(GLFW_JOYSTICK_2);
 	}
 
-	if (presentP1 == 1) {
-		if(!isStuned){
-		int axesCount;
-		const float* axes = glfwGetJoystickAxes(GLFW_JOYSTICK_1, &axesCount);
-		int buttonCount;
-		const unsigned char* buttons = glfwGetJoystickButtons(GLFW_JOYSTICK_1, &buttonCount);
-		const char* name = glfwGetJoystickName(GLFW_JOYSTICK_1);
+	int axesCount = NULL;
+	const float* axes = nullptr;
+	int buttonCount = NULL;
+	const unsigned char* buttons = nullptr;
+	const char* name = nullptr;
+
+	if (presentP1) {
+		if (!isStuned) {
+			axes = glfwGetJoystickAxes(GLFW_JOYSTICK_1, &axesCount);
+			buttonCount;
+			buttons = glfwGetJoystickButtons(GLFW_JOYSTICK_1, &buttonCount);
+			name = glfwGetJoystickName(GLFW_JOYSTICK_1);
+		}
+	} else if (presentP2) {
+		if (!isStuned) {
+			axesCount;
+			axes = glfwGetJoystickAxes(GLFW_JOYSTICK_2, &axesCount);
+			buttonCount;
+			buttons = glfwGetJoystickButtons(GLFW_JOYSTICK_2, &buttonCount);
+			name = glfwGetJoystickName(GLFW_JOYSTICK_2);
+		}
+	}
+
+	if (presentP1 || presentP2) {
 		/*
 		CCLOG("Axes Count: %d", axesCount);
 		CCLOG("Left Stick Hori: %.2f", axes[0]);
@@ -364,7 +382,7 @@ void Player::update(float dt) { // dt is in seconds
 				playerSprite->setScaleX(SPRITE_SCALE*orientation);
 				playerSprite->setScaleY(SPRITE_SCALE);
 				//playerSprite->setScale(0.3);
-				
+
 			}
 		}
 
@@ -381,11 +399,11 @@ void Player::update(float dt) { // dt is in seconds
 				playerSprite->setScaleY(SPRITE_SCALE);
 				//playerSprite->setScaleX(-0.3);	
 				//playerSprite->setScaleY(0.3);
-				
+
 			}
 		}
 		else {
-			acceleration.x*= 0.1;
+			acceleration.x *= 0.1;
 		}
 		if (buttons[A] == GLFW_PRESS) {
 			if (canJump) {
@@ -422,6 +440,7 @@ void Player::update(float dt) { // dt is in seconds
 			}
 		}
 		if (buttons[Y] == GLFW_PRESS) {
+			CCLOG("Y is Pressed");
 			isAttacking = true;
 			attackButtonPressed = true;
 			//stop old attack sounds	
@@ -442,141 +461,21 @@ void Player::update(float dt) { // dt is in seconds
 				playerSprite->runAction(attacking);
 				playerSprite->setScaleX(0.6 * orientation);
 				playerSprite->setScaleY(0.6);
-				
+
 			}
 		}
-		
-	}
-}
-	if (presentP2) {
-		if (!isStuned) {
-			int axesCount;
-			const float* axes = glfwGetJoystickAxes(GLFW_JOYSTICK_2, &axesCount);
-			int buttonCount;
-			const unsigned char* buttons = glfwGetJoystickButtons(GLFW_JOYSTICK_2, &buttonCount);
-			const char* name = glfwGetJoystickName(GLFW_JOYSTICK_2);
-			/*
-			CCLOG("Axes Count: %d", axesCount);
-			CCLOG("Left Stick Hori: %.2f", axes[0]);
-			CCLOG("Left Stick Vert: %.2f", axes[1]);
-			CCLOG("Right Stick Hori: %.2f", axes[2]);
-			CCLOG("Right Stick Vert: %.2f", axes[3]);
-			CCLOG("Left Trigger: %.2f", axes[4]);
-			CCLOG("Right Trigger: %.2f", axes[5]);
-
-			CCLOG("Button Count: %d", buttonCount);
-			CCLOG("A: %d", buttons[0] == GLFW_PRESS);
-			CCLOG("B: %d", buttons[1] == GLFW_PRESS);
-			CCLOG("X: %d", buttons[2] == GLFW_PRESS);
-			CCLOG("Y: %d", buttons[3] == GLFW_PRESS);
-			CCLOG("LB: %d", buttons[4] == GLFW_PRESS);
-			CCLOG("RB: %d", buttons[5] == GLFW_PRESS);
-			CCLOG("Select: %d", buttons[6] == GLFW_PRESS);
-			CCLOG("Start: %d", buttons[7] == GLFW_PRESS);
-			CCLOG("LS: %d", buttons[8] == GLFW_PRESS);
-			CCLOG("RS: %d", buttons[9] == GLFW_PRESS);
-			CCLOG("UP: %d", buttons[10] == GLFW_PRESS);
-			CCLOG("RT: %d", buttons[11] == GLFW_PRESS);
-			CCLOG("DN: %d", buttons[12] == GLFW_PRESS);
-			CCLOG("LF: %d", buttons[13] == GLFW_PRESS);
-			*/
-
-			//Moving right
-			if (axes[LS_HORI] > .2) {
-				acceleration.x = 3 * axes[0];
-				orientation = 1;
-				playerSprite->stopActionByTag(IDLE_TAG);
-				idling->setTag(NULL_TAG);
-				if (playerSprite->getActionByTag(1) == nullptr) {
-					walking->setTag(WALK_TAG);
-					playerSprite->runAction(walking);
-					playerSprite->setScaleX(SPRITE_SCALE * orientation);
-					playerSprite->setScaleY(SPRITE_SCALE);
-					//playerSprite->setScale(0.3);
-					
-				}
-			}
-
-			//Moving Left
-			else if (axes[LS_HORI] < -.2) {
-				acceleration.x = 3 * axes[0];
-				orientation = -1;
-				playerSprite->stopActionByTag(IDLE_TAG);
-				idling->setTag(NULL_TAG);
-				if (playerSprite->getActionByTag(1) == nullptr) {
-					walking->setTag(WALK_TAG);
-					playerSprite->runAction(walking);
-					playerSprite->setScaleX(SPRITE_SCALE * orientation);
-					playerSprite->setScaleY(SPRITE_SCALE);
-					//playerSprite->setScaleX(-0.3);	
-					//playerSprite->setScaleY(0.3);
-					
-				}
-			}
-			else {
-				acceleration.x *= 0.1;
-			}
-			if (buttons[A] == GLFW_PRESS) {
-				if (canJump) {
-					//stop old sound	
-					jump_channel->stop();
-					//file path	
-					std::string jump_path = FileUtils::getInstance()->fullPathForFilename("audio/jump.wav");
-					//create sound	
-					system->createSound(jump_path.c_str(), FMOD_LOOP_OFF, 0, &jump_sound);
-					system->playSound(jump_sound, 0, true, &jump_channel);
-					//set volume	
-					jump_channel->setVolume(sound_vol.getVolume());
-					//play	
-					jump_channel->setPaused(false);
-					acceleration.y += 200;
-					canJump = false;
-					playerSprite->stopActionByTag(IDLE_TAG);
-					idling->setTag(NULL_TAG);
-					if (playerSprite->getActionByTag(JUMP_TAG) == nullptr) {
-						jumping->setTag(JUMP_TAG);
-						playerSprite->runAction(jumping);
-						playerSprite->setScaleY(SPRITE_SCALE*2.5);
-						playerSprite->setScaleX(SPRITE_SCALE * orientation*2.5);
-						//playerSprite->setScale(0.3);
-						
-					}
-
-				}
-			}
-			if (buttons[B] == GLFW_PRESS) {
-				if (canJump) {
-					acceleration.x = 0;
-					velocity.x *= .5;
-					playerSprite->stopActionByTag(IDLE_TAG);
-					idling->setTag(NULL_TAG);
-				}
-			}
-			if (buttons[Y] == GLFW_PRESS) {
-				isAttacking = true;
-				attackButtonPressed = true;
-				//stop old sound	
-				attack_channel->stop();
-				//file path	
-				std::string attack_path = FileUtils::getInstance()->fullPathForFilename("audio/attack_miss.wav");
-				//create sound	
-				system->createSound(attack_path.c_str(), FMOD_LOOP_OFF, 0, &attack_sound);
-				system->playSound(attack_sound, 0, true, &attack_channel);
-				//set volume	
-				attack_channel->setVolume(sound_vol.getVolume());
-				//play sound	
-				attack_channel->setPaused(false);
-				playerSprite->stopActionByTag(IDLE_TAG);
-				idling->setTag(NULL_TAG);
-				if (playerSprite->getActionByTag(ATTACK_TAG) == nullptr) {
-					attacking->setTag(ATTACK_TAG);
-					playerSprite->runAction(attacking);
-					playerSprite->setScaleX(0.6 * orientation);
-					playerSprite->setScaleY(0.6);
-				}
+		if (buttons[X] == GLFW_PRESS) {
+			CCLOG("X is Pressed");
+			if (!hasItem) {
+				isPickingUp = true;
 			}
 		}
+		else {
+			isPickingUp = false;
+		}
+
 	}
+
 	if (onGround) {
 		if (velocity.y < 0) {
 			acceleration.y = 0;
@@ -637,9 +536,11 @@ bool Player::InAir(Vec2 Currentposition) {
 
 	return true;
 }
+
 void Player::setHitBox(Rect newBox) {
 	hitBox = newBox;
 }
+
 void Player::setAttackBox(Rect newBox) {
 	attackBox = newBox;
 }
@@ -664,6 +565,7 @@ bool Player::Attacked() {
 	attackButtonPressed = true;
 	return isAttacking;
 }
+
 //Converts pixel position to tile coordinate on tile map
 Vec2 Player::tileCoordForPosition(Vec2 CurrentPosition) {
 	int x = CurrentPosition.x / _CurMap->getTileSize().width; // tile x coord	
@@ -678,4 +580,8 @@ void Player::reset() {
 	velocity = Vec2(0, 0);
 	acceleration = Vec2(0, 0);
 	canJump = true;
+}
+
+void Player::setItem(Item* newItem) {
+	item = newItem;
 }

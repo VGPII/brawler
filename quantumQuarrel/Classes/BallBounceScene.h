@@ -30,6 +30,7 @@
 #include "MainMenu.h"
 #include "PostGameScene.h"
 #include "fmod.hpp"	
+#include "Item.h"
 #pragma once
 
 using namespace cocos2d;
@@ -47,6 +48,7 @@ public:
 	
 	bool checkForCollision(Rect Attacker, Rect Reciver); // Checks for collision between the attacker's hit box, and the other player's bounding box
 	void calculateKnockback(Player* Reciver, Player* Attacker); // Caclulates the knockback of the reciver based on the orientation of the attacker
+	void dealDamage(Player* Reciver, Player* Attacker, float dmg);
 	void toMainMenu();
 	void toPostGameScene(int playerWon);
 	void playerWon();
@@ -58,6 +60,7 @@ public:
 	int gameTimeMins;
 	int gameTimeSecs;
 	Label* timerGUI;
+	float itemSpawnCooldown;
 	
 	TMXTiledMap* _MainMap;
 	TMXLayer* _background;
@@ -69,6 +72,7 @@ public:
 
 	Player* playerOne;
 	Player* playerTwo;
+	Item* item;
 
 	bool canJump;
 	bool onGround;
