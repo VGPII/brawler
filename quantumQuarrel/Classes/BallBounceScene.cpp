@@ -130,6 +130,41 @@ void BallBounce::update(float dt) {
 	playerOne->update(dt);
 	playerTwo->update(dt);
 	playerWon();
+	if (item != nullptr) {
+		item->update(dt);
+	}
+	playerWon();
+	if (itemSpawnCooldown <= 0) {
+		itemSpawnCooldown = 35.0;
+		item = new Item();
+		item->init(gravity, RandomHelper::random_int(0, 1), _MainMap);
+		this->addChild(item->itemSprite);
+	}
+	else {
+		itemSpawnCooldown -= dt;
+	}
+
+
+	if (item != nullptr) {
+		if (playerOne->isPickingUp) {
+			if (!item->isEquiped) {
+				if (checkForCollision(playerOne->attackBox, item->hitBox)) {
+					item->pickUp();
+					playerOne->hasItem = true;
+					playerOne->setItem(item);
+				}
+			}
+		}
+		if (playerTwo->isPickingUp) {
+			if (!item->isEquiped) {
+				if (checkForCollision(playerTwo->attackBox, item->hitBox)) {
+					item->pickUp();
+					playerTwo->hasItem = true;
+					playerTwo->setItem(item);
+				}
+			}
+		}
+	}
 	if (playerOne->beginComboChain) {
 		if (!playerOne->ComboChain(dtF, dtI)) {
 			playerOne->beginComboChain = false;

@@ -435,8 +435,8 @@ void Player::update(float dt) { // dt is in seconds
 			if (playerSprite->getActionByTag(1) == nullptr) {
 				walking->setTag(WALK_TAG);
 				playerSprite->runAction(walking);
-				playerSprite->setScaleX(SPRITE_SCALE * orientation);
-				playerSprite->setScaleY(SPRITE_SCALE);
+				playerSprite->setScaleX(SPRITE_SCALE * orientation*0.4);
+				playerSprite->setScaleY(SPRITE_SCALE*0.4);
 
 			}
 		}
@@ -450,8 +450,8 @@ void Player::update(float dt) { // dt is in seconds
 			if (playerSprite->getActionByTag(WALK_TAG) == nullptr) {
 				walking->setTag(WALK_TAG);
 				playerSprite->runAction(walking);
-				playerSprite->setScaleX(SPRITE_SCALE * orientation);
-				playerSprite->setScaleY(SPRITE_SCALE);
+				playerSprite->setScaleX(SPRITE_SCALE * orientation*0.4);
+				playerSprite->setScaleY(SPRITE_SCALE*0.4);
 
 			}
 		}
