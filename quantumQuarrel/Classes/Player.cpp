@@ -10,7 +10,6 @@ USING_NS_CC;
 #define RS_VERT 3
 #define LT 4
 #define RT 5
-
 #define A 0
 #define B 1
 #define X 2
@@ -30,7 +29,9 @@ USING_NS_CC;
 #define WALK_TAG 1
 #define IDLE_TAG 0
 #define NULL_TAG -1
-#define SPRITE_SCALE 0.55	
+#define REACT_LOW_TAG 4
+#define REACT_HIGH_TAG 5
+#define SPRITE_SCALE 0.4
 float volume_animations;
 
 bool Player::init(int gravStrength, TMXTiledMap* initMap, Rect initBoundingBox, int playerNumberInit, float volume)
@@ -46,7 +47,7 @@ bool Player::init(int gravStrength, TMXTiledMap* initMap, Rect initBoundingBox, 
 	NUM_JUMP_FRAMES = 6;
 	NUM_WALK_FRAMES = 5;
 	NUM_ATTACK_FRAMES = 5;
-
+	NUM_REACT_FRAMES = 2;
 	playerLives = 3;
 	damage = 0.0;
 	comboCooldownTime = 0.5;
@@ -56,15 +57,12 @@ bool Player::init(int gravStrength, TMXTiledMap* initMap, Rect initBoundingBox, 
 	objectGroup = _CurMap->getObjectGroup("SpawnPoints");
 	playerNumber = playerNumberInit;
 	guiGroup = _CurMap->getObjectGroup("GUI");
-
 	item = nullptr;
 
+	
 	if (objectGroup == NULL) {
 		CCLOG("Tile map does not have an object layer");
 	}
-	
-	
-	
 	if (playerNumber == 1) {
 		playerSprite = Sprite::create("/PlayerAnimation/player1/hit_reaction/react_1.png");
 		playerSprite->setScale(SPRITE_SCALE);
@@ -90,20 +88,18 @@ bool Player::init(int gravStrength, TMXTiledMap* initMap, Rect initBoundingBox, 
 		damageLabel = Label::createWithSystemFont("0.0%", "Arial", 20);
 		damageLabel->setAnchorPoint(cocos2d::Vec2(0, 0));
 		damageLabel->setPosition(playerDamageIcon1->getPosition().x+40, playerDamageIcon1->getPosition().y+25);
-		
 		itemSwordIcon = Sprite::create("/itemAssets/sword.png");
 		itemShieldIcon = Sprite::create("/itemAssets/shield.png");
-		
+
 		itemSwordIcon->setScale(0.4);
 		itemShieldIcon->setScale(0.4);
-		
+
 		itemSwordIcon->setPosition(playerDamageIcon3->getPosition() + Vec2(-60, -35));
 		itemShieldIcon->setPosition(playerDamageIcon3->getPosition() + Vec2(-60, -35));
-
 		itemSwordIcon->setVisible(false);
 		itemShieldIcon->setVisible(false);
 
-
+		
 		loadAnimations();
 	}
 	else if (playerNumber == 2) {
@@ -132,13 +128,10 @@ bool Player::init(int gravStrength, TMXTiledMap* initMap, Rect initBoundingBox, 
 		damageLabel->setPosition(playerDamageIcon1->getPosition().x + 40, playerDamageIcon1->getPosition().y + 25);
 		itemSwordIcon = Sprite::create("/itemAssets/sword.png");
 		itemShieldIcon = Sprite::create("/itemAssets/shield.png");
-
 		itemSwordIcon->setScale(0.4);
 		itemShieldIcon->setScale(0.4);
-
 		itemSwordIcon->setPosition(playerDamageIcon3->getPosition());
 		itemShieldIcon->setPosition(playerDamageIcon3->getPosition());
-
 		itemSwordIcon->setVisible(false);
 		itemShieldIcon->setVisible(false);
 		loadAnimations();
@@ -167,6 +160,7 @@ bool Player::init(int gravStrength, TMXTiledMap* initMap, Rect initBoundingBox, 
 	attackButtonPressed = false;
 	
 	//initialize the sound system, this is where the volume level is set from the options menu, for now it is hard coded at 0.5f	
+	
 	FMOD::System_Create(&system);
 	system->init(32, FMOD_INIT_NORMAL, nullptr);
 	sound_vol.setVolume(volume_animations);
@@ -179,7 +173,7 @@ void Player::loadAnimations() {
 		//Loading jumping animation
 		for (int i = 1; i <= NUM_JUMP_FRAMES; i++) {
 			sprintf(str, "/PlayerAnimation/player1/jump/jump_%i.png", i);
-			auto frame = SpriteFrame::create(str, Rect(position.x, position.y, 205, 325), false, Vec2(0, 0), Size(205, 325));
+			auto frame = SpriteFrame::create(str, Rect(position.x, position.y, 205, 307), false, Vec2(0, 0), Size(205, 307));
 			JumpAnimation.pushBack(frame);
 		}
 		auto tmpAnimation = Animation::createWithSpriteFrames(JumpAnimation, 0.12f);
@@ -190,7 +184,7 @@ void Player::loadAnimations() {
 		//Loading Walking animation
 		for (int i = 1; i <= NUM_WALK_FRAMES; i++) {
 			sprintf(str, "/PlayerAnimation/player1/walk/Walking_%i.png", i);
-			auto frame = SpriteFrame::create(str, Rect(position.x, position.y, 205, 325), false, Vec2(0, 0), Size(205, 325));
+			auto frame = SpriteFrame::create(str, Rect(position.x, position.y, 369, 572), false, Vec2(0, 0), Size(369, 572));
 			walkAnimation.pushBack(frame);
 		}
 		tmpAnimation = Animation::createWithSpriteFrames(walkAnimation, 0.09f);
@@ -202,7 +196,7 @@ void Player::loadAnimations() {
 		//Will fully implement later
 		for (int i = 1; i <= NUM_IDLE_FRAMES; i++) {
 			sprintf(str, "/PlayerAnimation/player1/hit_reaction/react_%i.png", i);
-			auto frame = SpriteFrame::create(str, Rect(position.x, position.y, 205, 325), false, Vec2(0, 0), Size(205, 325));
+			auto frame = SpriteFrame::create(str, Rect(position.x, position.y, 124, 202), false, Vec2(0, 0), Size(124, 202));
 			idleAnimation.pushBack(frame);
 		}
 		tmpAnimation = Animation::createWithSpriteFrames(idleAnimation, 0.09f);
@@ -210,21 +204,40 @@ void Player::loadAnimations() {
 		idleAnimate->retain();
 		idling = idleAnimate;
 
-		for (int i = 1; i < NUM_ATTACK_FRAMES; i++) {
+		for (int i = 1; i <= NUM_ATTACK_FRAMES; i++) {
 			sprintf(str, "/PlayerAnimation/player1/attack/punching_%i.png", i);
-			auto frame = SpriteFrame::create(str, Rect(position.x, position.y, 205, 325), false, Vec2(0, 0), Size(205, 325));
+			auto frame = SpriteFrame::create(str, Rect(position.x, position.y, 254, 310), false, Vec2(0, 0), Size(254, 310));
 			attackAnimation.pushBack(frame);
 		}
 		tmpAnimation = Animation::createWithSpriteFrames(attackAnimation, 0.09f);
 		attackAnimate = Animate::create(tmpAnimation);
 		attackAnimate->retain();
 		attacking = attackAnimate;
+		for (int i = 1; i <= NUM_REACT_FRAMES; i++) {
+			sprintf(str, "/PlayerAnimation/player1/hit_reaction/react_%i.png", i);
+			auto frame = SpriteFrame::create(str, Rect(position.x, position.y, 127, 199), false, Vec2(0, 0), Size(127, 199));
+			reactAnimationLow.pushBack(frame);
+		}
+		tmpAnimation = Animation::createWithSpriteFrames(reactAnimationLow, 0.09f);
+		reactAnimateLow = Animate::create(tmpAnimation);
+		reactAnimateLow->retain();
+		reactingLow = reactAnimateLow;
+
+		for (int i = 3; i <= NUM_REACT_FRAMES+2; i++) {
+			sprintf(str, "/PlayerAnimation/player1/hit_reaction/react_%i.png", i);
+			auto frame = SpriteFrame::create(str, Rect(position.x, position.y, 151, 200), false, Vec2(0, 0), Size(151, 200));
+			reactAnimationHigh.pushBack(frame);
+		}
+		tmpAnimation = Animation::createWithSpriteFrames(reactAnimationHigh, 0.09f);
+		reactAnimateHigh = Animate::create(tmpAnimation);
+		reactAnimateHigh->retain();
+		reactingHigh = reactAnimateHigh;
 	}
 	else {
 		//Loading jumping animation
 		for (int i = 1; i <= NUM_JUMP_FRAMES; i++) {
 			sprintf(str, "/PlayerAnimation/player2/jump/jump_%i.png", i);
-			auto frame = SpriteFrame::create(str, Rect(position.x, position.y, 205, 325), false, Vec2(0, 0), Size(205, 325));
+			auto frame = SpriteFrame::create(str, Rect(position.x, position.y, 205, 307), false, Vec2(0, 0), Size(205, 307));
 			JumpAnimation.pushBack(frame);
 		}
 		auto tmpAnimation = Animation::createWithSpriteFrames(JumpAnimation, 0.12f);
@@ -235,7 +248,7 @@ void Player::loadAnimations() {
 		//Loading Walking animation
 		for (int i = 1; i <= NUM_WALK_FRAMES; i++) {
 			sprintf(str, "/PlayerAnimation/player2/walk/Walking_%i.png", i);
-			auto frame = SpriteFrame::create(str, Rect(position.x, position.y, 205, 325), false, Vec2(0, 0), Size(205, 325));
+			auto frame = SpriteFrame::create(str, Rect(position.x, position.y, 369, 572), false, Vec2(0, 0), Size(369, 572));
 			walkAnimation.pushBack(frame);
 		}
 		tmpAnimation = Animation::createWithSpriteFrames(walkAnimation, 0.09f);
@@ -247,7 +260,7 @@ void Player::loadAnimations() {
 		//Will fully implement later
 		for (int i = 1; i <= NUM_IDLE_FRAMES; i++) {
 			sprintf(str, "/PlayerAnimation/player2/hit_reaction/react_%i.png", i);
-			auto frame = SpriteFrame::create(str, Rect(position.x, position.y, 205, 325), false, Vec2(0, 0), Size(205, 325));
+			auto frame = SpriteFrame::create(str, Rect(position.x, position.y, 124, 202), false, Vec2(0, 0), Size(124, 202));
 			idleAnimation.pushBack(frame);
 		}
 		tmpAnimation = Animation::createWithSpriteFrames(idleAnimation, 0.09f);
@@ -255,20 +268,37 @@ void Player::loadAnimations() {
 		idleAnimate->retain();
 		idling = idleAnimate;
 
-		for (int i = 1; i < NUM_ATTACK_FRAMES; i++) {
+		for (int i = 1; i <= NUM_ATTACK_FRAMES; i++) {
 			sprintf(str, "/PlayerAnimation/player2/attack/punching_%i.png", i);
-			auto frame = SpriteFrame::create(str, Rect(position.x, position.y, 205, 325), false, Vec2(0, 0), Size(205, 325));
+			auto frame = SpriteFrame::create(str, Rect(position.x, position.y, 254, 310), false, Vec2(0, 0), Size(254, 310));
 			attackAnimation.pushBack(frame);
 		}
 		tmpAnimation = Animation::createWithSpriteFrames(attackAnimation, 0.09f);
 		attackAnimate = Animate::create(tmpAnimation);
 		attackAnimate->retain();
 		attacking = attackAnimate;
-		
+		for (int i = 1; i <= NUM_REACT_FRAMES; i++) {
+			sprintf(str, "/PlayerAnimation/player2/hit_reaction/react_%i.png", i);
+			auto frame = SpriteFrame::create(str, Rect(position.x, position.y, 127, 199), false, Vec2(0, 0), Size(127, 199));
+			reactAnimationLow.pushBack(frame);
+		}
+		tmpAnimation = Animation::createWithSpriteFrames(reactAnimationLow, 0.09f);
+		reactAnimateLow = Animate::create(tmpAnimation);
+		reactAnimateLow->retain();
+		reactingLow = reactAnimateLow;
+
+		for (int i = 3; i <= NUM_REACT_FRAMES + 2; i++) {
+			sprintf(str, "/PlayerAnimation/player2/hit_reaction/react_%i.png", i);
+			auto frame = SpriteFrame::create(str, Rect(position.x, position.y, 151, 200), false, Vec2(0, 0), Size(151, 200));
+			reactAnimationHigh.pushBack(frame);
+		}
+		tmpAnimation = Animation::createWithSpriteFrames(reactAnimationHigh, 0.09f);
+		reactAnimateHigh = Animate::create(tmpAnimation);
+		reactAnimateHigh->retain();
+		reactingHigh = reactAnimateHigh;
 
 	}
 }
-
 void Player::update(float dt) { // dt is in seconds
 	isAttacking = false;
 	if (isStuned) {
@@ -287,7 +317,7 @@ void Player::update(float dt) { // dt is in seconds
 		//play the sound	
 		death_channel->setPaused(false);
 		if (playerLives == 2) {
-			
+
 			playerDamageIcon3->setVisible(false);
 			playerDamageIcon2->setVisible(true);
 		}
@@ -300,7 +330,7 @@ void Player::update(float dt) { // dt is in seconds
 		return;
 	}
 	if (onCooldown) {
-		comboCooldown -= dt*10;
+		comboCooldown -= dt * 10;
 		if (comboCooldown <= 0) {
 			onCooldown = false;
 			comboCooldown = comboCooldownTime;
@@ -326,15 +356,15 @@ void Player::update(float dt) { // dt is in seconds
 		//Temp statement 
 		playerSprite->stopActionByTag(JUMP_TAG);
 		jumping->setTag(NULL_TAG);
-		if (abs(velocity.x) <=0.1 && abs(acceleration.x) == 0 && playerSprite->getActionByTag(ATTACK_TAG)==nullptr) {
+		if (abs(velocity.x) <= 0.1 && abs(acceleration.x) == 0 && playerSprite->getActionByTag(ATTACK_TAG) == nullptr) {
 			playerSprite->stopAllActions();
 			walking->setTag(NULL_TAG);
 			if (playerSprite->getActionByTag(IDLE_TAG) == nullptr) {
 				idling->setTag(IDLE_TAG);
 				playerSprite->setScale(SPRITE_SCALE);
 				playerSprite->runAction(idling);
-				
-			}	
+
+			}
 		}
 	}
 	int presentP1 = 0;
@@ -360,7 +390,8 @@ void Player::update(float dt) { // dt is in seconds
 			buttons = glfwGetJoystickButtons(GLFW_JOYSTICK_1, &buttonCount);
 			name = glfwGetJoystickName(GLFW_JOYSTICK_1);
 		}
-	} else if (presentP2) {
+	}
+	else if (presentP2) {
 		if (!isStuned) {
 			axesCount;
 			axes = glfwGetJoystickAxes(GLFW_JOYSTICK_2, &axesCount);
@@ -379,7 +410,6 @@ void Player::update(float dt) { // dt is in seconds
 		CCLOG("Right Stick Vert: %.2f", axes[3]);
 		CCLOG("Left Trigger: %.2f", axes[4]);
 		CCLOG("Right Trigger: %.2f", axes[5]);
-
 		CCLOG("Button Count: %d", buttonCount);
 		CCLOG("A: %d", buttons[0] == GLFW_PRESS);
 		CCLOG("B: %d", buttons[1] == GLFW_PRESS);
@@ -405,7 +435,7 @@ void Player::update(float dt) { // dt is in seconds
 			if (playerSprite->getActionByTag(1) == nullptr) {
 				walking->setTag(WALK_TAG);
 				playerSprite->runAction(walking);
-				playerSprite->setScaleX(SPRITE_SCALE*orientation);
+				playerSprite->setScaleX(SPRITE_SCALE * orientation);
 				playerSprite->setScaleY(SPRITE_SCALE);
 
 			}
@@ -420,7 +450,7 @@ void Player::update(float dt) { // dt is in seconds
 			if (playerSprite->getActionByTag(WALK_TAG) == nullptr) {
 				walking->setTag(WALK_TAG);
 				playerSprite->runAction(walking);
-				playerSprite->setScaleX(SPRITE_SCALE*orientation);
+				playerSprite->setScaleX(SPRITE_SCALE * orientation);
 				playerSprite->setScaleY(SPRITE_SCALE);
 
 			}
@@ -449,7 +479,7 @@ void Player::update(float dt) { // dt is in seconds
 					jumping->setTag(JUMP_TAG);
 					playerSprite->runAction(jumping);
 					playerSprite->setScaleY(SPRITE_SCALE);
-					playerSprite->setScaleX(SPRITE_SCALE*orientation);
+					playerSprite->setScaleX(SPRITE_SCALE * orientation);
 					//playerSprite->setScale(0.3);
 				}
 
@@ -529,7 +559,8 @@ void Player::update(float dt) { // dt is in seconds
 			itemShieldIcon->setVisible(false);
 			itemSwordIcon->setVisible(true);
 		}
-	} else {
+	}
+	else {
 		itemShieldIcon->setVisible(false);
 		itemSwordIcon->setVisible(false);
 	}
@@ -538,6 +569,7 @@ void Player::update(float dt) { // dt is in seconds
 	footPos = Vec2(position.x, position.y - (height / 2));
 	playerSprite->setPosition(position);
 }
+
 bool Player::hitDeathPlane(Vec2 currentPosition) {
 	Vec2 tileCoord = tileCoordForPosition(currentPosition);
 	int tileGid = _DeathPlane->getTileGIDAt(tileCoord);
@@ -547,6 +579,23 @@ bool Player::hitDeathPlane(Vec2 currentPosition) {
 		return true;
 	}
 	return false;
+}
+//Animation changes based on the amount of damage the player has taken
+void Player::playKnockBackAnimation() {
+	
+	if (damage > 50.0) {
+		if (playerSprite->getActionByTag(REACT_HIGH_TAG) == nullptr) {
+			playerSprite->runAction(reactingHigh);
+			reactingHigh->setTag(5);
+		}
+	}
+	else {
+		if (playerSprite->getActionByTag(REACT_LOW_TAG) == nullptr) {
+			playerSprite->runAction(reactingLow);
+			reactingLow->setTag(4);
+		}
+		
+	}
 }
 bool Player::ComboChain(float dtF, float dtI) {
 	//Only works if the next attack input happens two seconds or less after the previous
@@ -571,11 +620,9 @@ bool Player::InAir(Vec2 Currentposition) {
 
 	return true;
 }
-
 void Player::setHitBox(Rect newBox) {
 	hitBox = newBox;
 }
-
 void Player::setAttackBox(Rect newBox) {
 	attackBox = newBox;
 }
@@ -600,7 +647,6 @@ bool Player::Attacked() {
 	attackButtonPressed = true;
 	return isAttacking;
 }
-
 //Converts pixel position to tile coordinate on tile map
 Vec2 Player::tileCoordForPosition(Vec2 CurrentPosition) {
 	int x = CurrentPosition.x / _CurMap->getTileSize().width; // tile x coord	
@@ -616,7 +662,6 @@ void Player::reset() {
 	acceleration = Vec2(0, 0);
 	canJump = true;
 }
-
 void Player::setItem(Item* newItem) {
 	item = newItem;
 }

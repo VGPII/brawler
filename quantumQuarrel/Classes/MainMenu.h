@@ -28,9 +28,9 @@
 
 #include "cocos2d.h"
 #include "BallBounceScene.h"
-#include "fmod.hpp"
-#include "AudioManager.h"
+#include "fmod.hpp"	
 #include "OptionsMenu.h"
+#include "AudioManager.h"
 
 using namespace cocos2d;
 
@@ -39,7 +39,7 @@ class MainMenu : public cocos2d::Scene
 public:
 	static cocos2d::Scene* createScene(bool prevbutton, float volume = 0.5f);
 
-	virtual bool init(float volume = 0.5f);
+	virtual bool init();
 	void update(float dt);
 	void updateMenu();
 	void getControllerInput(float dt);
@@ -63,13 +63,15 @@ public:
 	int NUM_OF_MENU_ITEMS = 2;
 	int previousCursorPosition;
 	bool cursorMoved;
-
-	FMOD::System *system;
-	FMOD::Sound *background_sound;
-	FMOD::Sound *intro_sound;
-	FMOD::Channel *intro_channel;
+	FMOD::System* system;
+	FMOD::Sound* background_sound;
+	FMOD::Sound* intro_sound;
+	FMOD::Channel* intro_channel;
 	AudioManager sound_vol;
 	//OptionsMenu volume_level;
 };
 
 #endif // __MAINMENU__H__
+
+
+

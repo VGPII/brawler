@@ -56,15 +56,14 @@ public:
 	int NUM_OF_MENU_ITEMS = 2;
 	int previousCursorPosition;
 	bool cursorMoved;
-	FMOD::System *system;
-	FMOD::Channel *p1Win;
-	FMOD::Channel *p2Win;
-	FMOD::Channel *applause;
-	FMOD::Sound *p1WinSound;
-	FMOD::Sound *p2WinSound;
-	FMOD::Sound *applause_sound;
+	FMOD::System* system;
+	FMOD::Channel* p1Win;
+	FMOD::Channel* p2Win;
+	FMOD::Channel* applause;
+	FMOD::Sound* p1WinSound;
+	FMOD::Sound* p2WinSound;
+	FMOD::Sound* applause_sound;
 	AudioManager sound_vol;
-
 };
 
 #endif // __MAINMENU__H__

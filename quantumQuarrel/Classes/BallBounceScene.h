@@ -84,12 +84,11 @@ public:
 	bool debugMode = false;
 	void drawBox(DrawNode* node, Vec2 bottomLeft, Vec2 topRight);
 	void drawBox(DrawNode* node, Rect rectangle, Color4F color);
-	
-	FMOD::Channel *attackMissChannel;
-	FMOD::Channel *attackHitChannel;
-	FMOD::Sound *attackMissSound;
-	FMOD::Sound *attackHitSound;
-	FMOD::System *system;
+	FMOD::Channel* attackMissChannel;
+	FMOD::Channel* attackHitChannel;
+	FMOD::Sound* attackMissSound;
+	FMOD::Sound* attackHitSound;
+	FMOD::System* system;
 	AudioManager sound_vol;
 };
 

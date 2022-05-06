@@ -49,7 +49,7 @@ bool Item::init(int gravStrength, int initType, TMXTiledMap* initMap) {
 	itemSprite->setScale(0.5);
 	// Position to spawn at
 	ValueMap itemSpawnPoint = objectGroup->getObject("itemSpawnPoint");
-	Spawnpoint = Vec2(itemSpawnPoint.at("x").asInt() * _CurMap->getScaleX(), itemSpawnPoint.at("y").asInt()* _CurMap->getScaleY());
+	Spawnpoint = Vec2(itemSpawnPoint.at("x").asInt() * _CurMap->getScaleX(), itemSpawnPoint.at("y").asInt() * _CurMap->getScaleY());
 	position = Spawnpoint;
 	velocity = cocos2d::Vec2(0, 0);
 	acceleration = cocos2d::Vec2(0, 0);
@@ -68,7 +68,8 @@ void Item::update(float dt) {
 		// Adjust timer
 		if (idleDuration <= 0) {
 			setToDespawn = true;
-		} else {
+		}
+		else {
 			idleDuration -= dt;
 		}
 	}

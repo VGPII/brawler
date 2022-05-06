@@ -23,15 +23,13 @@
  ****************************************************************************/
 
 #include "BallBounceScene.h"
-#pragma once	
 #include "fmod.hpp"	
 #include "MainMenu.h"	
 #include "Player.h"
-#include "Item.h"
+#pragma once	
 
 USING_NS_CC;
 float overall_vol;
-
 Scene* BallBounce::createScene(float volume)
 {
 	overall_vol = volume;
@@ -56,7 +54,7 @@ bool BallBounce::init()
 
 	gravity = 400;
 	dtF = 0;
-	gameTime = 300;
+	gameTime = 180; // Total game time in seconds
 
 	_MainMap = TMXTiledMap::create("mainMap.tmx");
 	auto background = _MainMap->getLayer("Background");
@@ -79,11 +77,9 @@ bool BallBounce::init()
 	playerTwo->init(gravity, _MainMap, this->getBoundingBox(), 2, overall_vol);
 	item->init(gravity, RandomHelper::random_int(0, 1), _MainMap);
 
-
 	this->addChild(playerOne->playerSprite);
 	this->addChild(playerTwo->playerSprite);
 	this->addChild(item->itemSprite);
-	
 	this->addChild(playerOne->playerDamageIcon3);
 	this->addChild(playerOne->playerDamageIcon2);
 	this->addChild(playerOne->playerDamageIcon1);
@@ -102,9 +98,9 @@ bool BallBounce::init()
 	//Creating the timer
 	gameTimeMins = gameTime / 60;
 	gameTimeSecs = gameTime - gameTimeMins * 60;
-	timerGUI = Label::createWithSystemFont(std::to_string(gameTimeMins) + ":" + std::to_string(gameTimeSecs)+ "0", "Arial", 20);
-	timerGUI->setAnchorPoint(cocos2d::Vec2(0, 0));
+	timerGUI = Label::createWithSystemFont(std::to_string(gameTimeMins) + ":" + std::to_string(gameTimeSecs)+ "0", "Arial", 70);
 	timerGUI->setColor(Color3B::BLACK);
+	timerGUI->setAnchorPoint(cocos2d::Vec2(0, 0));
 	auto gui = _MainMap->getObjectGroup("GUI");
 	ValueMap timerPos = gui->getObject("Timer");
 	timerGUI->setPosition(Vec2(timerPos.at("x").asInt() * _MainMap->getScaleX(), timerPos.at("y").asInt() * _MainMap->getScaleY()));
@@ -114,6 +110,7 @@ bool BallBounce::init()
 	this->scheduleUpdate();
 	schedule(CC_SCHEDULE_SELECTOR(BallBounce::timer), 1.0f, kRepeatForever, 0); // get controller input every 0.1 seconds
 	this->addChild(node);
+
 
 	FMOD::System_Create(&system);
 	system->init(32, FMOD_INIT_NORMAL, nullptr);
@@ -132,74 +129,39 @@ void BallBounce::update(float dt) {
 	dtF+= dt;
 	playerOne->update(dt);
 	playerTwo->update(dt);
-	if (item != nullptr) {
-		item->update(dt);
-	}
 	playerWon();
-	if (itemSpawnCooldown <= 0) {
-		itemSpawnCooldown = 35.0;
-		item = new Item();
-		item->init(gravity, RandomHelper::random_int(0, 1), _MainMap);
-		this->addChild(item->itemSprite);
-	}
-	else {
-		itemSpawnCooldown -= dt;
-	}
-
-
-	if (item != nullptr) {
-		if (playerOne->isPickingUp) {
-			if (!item->isEquiped) {
-				if (checkForCollision(playerOne->attackBox, item->hitBox)) {
-					item->pickUp();
-					playerOne->hasItem = true;
-					playerOne->setItem(item);
-				}
-			}
-		}
-		if (playerTwo->isPickingUp) {
-			if (!item->isEquiped) {
-				if (checkForCollision(playerTwo->attackBox, item->hitBox)) {
-					item->pickUp();
-					playerTwo->hasItem = true;
-					playerTwo->setItem(item);
-				}
-			}
-		}
-	}
-
 	if (playerOne->beginComboChain) {
 		if (!playerOne->ComboChain(dtF, dtI)) {
 			playerOne->beginComboChain = false;
 			calculateKnockback(playerTwo, playerOne);
-			//Other player is knocked back once the chain ends.
+			//Other player is knocked back once the chain ends.	
 			playerTwo->isStuned = false;
 			playerOne->onCooldown = true;
 		}
 	}
 	if (playerOne->Attacked()) {
 		if (checkForCollision(playerOne->attackBox, playerTwo->hitBox)) {
-			//Play knockback animation
+			//Play knockback animation	
 			if (playerOne->onGround) {
 				if (!playerOne->onCooldown) {
 					if (playerOne->beginComboChain == false) {
 						playerOne->beginComboChain = true;
 						playerOne->comboStartTime = dtF;
 					}
-					//Begining a combo chain on the ground
+					//Begining a combo chain on the ground	
 					if (playerOne->ComboChain(dtF, dtI)) {
 						dealDamage(playerTwo, playerOne, 2.5);
 						playerTwo->isStuned = true;
-						//stop old attack sounds	
+						//stop old attack sounds		
 						attackHitChannel->stop();
-						//file path	
+						//file path		
 						std::string attackHitPath = FileUtils::getInstance()->fullPathForFilename("audio/attack_hit.wav");
-						//create sound	
+						//create sound		
 						system->createSound(attackHitPath.c_str(), FMOD_LOOP_OFF, 0, &attackHitSound);
 						system->playSound(attackHitSound, 0, true, &attackHitChannel);
-						//set volume	
+						//set volume		
 						attackHitChannel->setVolume(sound_vol.getVolume());
-						//play
+						//play	
 						attackHitChannel->setPaused(false);
 					}
 				}
@@ -207,31 +169,30 @@ void BallBounce::update(float dt) {
 			else {
 				dealDamage(playerTwo, playerOne, 1.2);
 				calculateKnockback(playerTwo, playerOne);
-
-				//stop old attack sounds	
+				//stop old attack sounds		
 				attackHitChannel->stop();
-				//file path	
+				//file path		
 				std::string attackHitPath = FileUtils::getInstance()->fullPathForFilename("audio/attack_hit.wav");
-				//create sound	
+				//create sound		
 				system->createSound(attackHitPath.c_str(), FMOD_LOOP_OFF, 0, &attackHitSound);
 				system->playSound(attackHitSound, 0, true, &attackHitChannel);
-				//set volume	
+				//set volume		
 				attackHitChannel->setVolume(sound_vol.getVolume());
-				//play
+				//play	
 				attackHitChannel->setPaused(false);
 			}
 		}
 		else {
-			//stop old attack sounds	
+			//stop old attack sounds		
 			attackMissChannel->stop();
-			//file path	
+			//file path		
 			std::string attackMissPath = FileUtils::getInstance()->fullPathForFilename("audio/attack_miss.wav");
-			//create sound	
+			//create sound		
 			system->createSound(attackMissPath.c_str(), FMOD_LOOP_OFF, 0, &attackMissSound);
 			system->playSound(attackMissSound, 0, true, &attackMissChannel);
-			//set volume	
+			//set volume		
 			attackMissChannel->setVolume(sound_vol.getVolume());
-			//play
+			//play	
 			attackMissChannel->setPaused(false);
 		}
 	}
@@ -242,7 +203,7 @@ void BallBounce::update(float dt) {
 			playerOne->isStuned = false;
 			playerTwo->onCooldown = true;
 		}
-		
+
 	}
 	if (playerTwo->Attacked()) {
 		if (checkForCollision(playerTwo->attackBox, playerOne->hitBox)) {
@@ -252,20 +213,20 @@ void BallBounce::update(float dt) {
 						playerTwo->beginComboChain = true;
 						playerTwo->comboStartTime = dtF;
 					}
-					//Begining a combo chain on the ground
+					//Begining a combo chain on the ground	
 					if (playerTwo->ComboChain(dtF, dtI)) {
 						dealDamage(playerOne, playerTwo, 2.5);
 						playerOne->isStuned = true;
-						//stop old attack sounds	
+						//stop old attack sounds		
 						attackHitChannel->stop();
-						//file path	
+						//file path		
 						std::string attackHitPath = FileUtils::getInstance()->fullPathForFilename("audio/attack_hit.wav");
-						//create sound	
+						//create sound		
 						system->createSound(attackHitPath.c_str(), FMOD_LOOP_OFF, 0, &attackHitSound);
 						system->playSound(attackHitSound, 0, true, &attackHitChannel);
-						//set volume	
+						//set volume		
 						attackHitChannel->setVolume(sound_vol.getVolume());
-						//play
+						//play	
 						attackHitChannel->setPaused(false);
 					}
 				}
@@ -273,30 +234,30 @@ void BallBounce::update(float dt) {
 			else {
 				dealDamage(playerOne, playerTwo, 1.2);
 				calculateKnockback(playerOne, playerTwo);
-				//stop old attack sounds	
+				//stop old attack sounds		
 				attackHitChannel->stop();
-				//file path	
+				//file path		
 				std::string attackHitPath = FileUtils::getInstance()->fullPathForFilename("audio/attack_hit.wav");
-				//create sound	
+				//create sound		
 				system->createSound(attackHitPath.c_str(), FMOD_LOOP_OFF, 0, &attackHitSound);
 				system->playSound(attackHitSound, 0, true, &attackHitChannel);
-				//set volume	
+				//set volume		
 				attackHitChannel->setVolume(sound_vol.getVolume());
-				//play
+				//play	
 				attackHitChannel->setPaused(false);
 			}
 		}
 		else {
-			//stop old attack sounds	
+			//stop old attack sounds		
 			attackMissChannel->stop();
-			//file path	
+			//file path		
 			std::string attackMissPath = FileUtils::getInstance()->fullPathForFilename("audio/attack_miss.wav");
-			//create sound	
+			//create sound		
 			system->createSound(attackMissPath.c_str(), FMOD_LOOP_OFF, 0, &attackMissSound);
 			system->playSound(attackMissSound, 0, true, &attackMissChannel);
-			//set volume	
+			//set volume		
 			attackMissChannel->setVolume(sound_vol.getVolume());
-			//play
+			//play	
 			attackMissChannel->setPaused(false);
 		}
 	}
@@ -314,7 +275,6 @@ void BallBounce::update(float dt) {
 			item = nullptr;
 		}
 	}
-
 	// For debugging purposes
 	if (debugMode) {
 		node->clear();
@@ -327,7 +287,7 @@ void BallBounce::update(float dt) {
 		drawBox(node, playerTwo->attackBox, Color4F::BLUE);
 		node->drawPoint(playerOne->footPos, 5, Color4F::WHITE);
 		node->drawPoint(playerTwo->footPos, 5, Color4F::BLUE);
-		//items
+		//items	
 		if (item != nullptr) {
 			drawBox(node, item->hitBox, Color4F::GREEN);
 			node->drawPoint(item->basePos, 5, Color4F::GREEN);
@@ -426,9 +386,10 @@ void BallBounce::calculateKnockback(Player* Reciver, Player* Attacker) {
 		Reciver->acceleration.y -= 50;
 	}
 	Reciver->damageLabel->setString(std::to_string(Reciver->damage).substr(0,4)+ "%");
+	Reciver->playKnockBackAnimation();
 }
 
-//Calculates the damage after the user recives a hit
+//Calculates the damage after the user recives a hit	
 void BallBounce::dealDamage(Player* Reciver, Player* Attacker, float dmg) {
 	if (Attacker->hasItem) {
 		if (Attacker->item->type == 1) {

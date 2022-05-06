@@ -24,11 +24,13 @@ THE SOFTWARE.
 
 #include "PostGameScene.h"
 #include <math.h>
-#include "fmod.hpp"
+#include "fmod.hpp"	
 #include "AudioManager.h"
+
 USING_NS_CC;
 int playerText;
 float postGameVolume;
+
 Scene* PostGameScene::createScene(int playerWon, float volume) {
 	postGameVolume = volume;
 	playerText = playerWon;
@@ -51,27 +53,26 @@ bool PostGameScene::init() {
 		label1->setAnchorPoint(cocos2d::Vec2(0,0));
 		label1->setPosition(cocos2d::Vec2(winSize.width / 4, winSize.height / 2));
 		this->addChild(label1, 1);
-		//file path
+		//file path	
 		std::string p1WinPath = FileUtils::getInstance()->fullPathForFilename("audio/p1_win.wav");
-		//create sound
+		//create sound	
 		system->createSound(p1WinPath.c_str(), FMOD_LOOP_OFF, 0, &p1WinSound);
-		//init sound but set to pause until volume set
+		//init sound but set to pause until volume set	
 		system->playSound(p1WinSound, 0, true, &p1Win);
-		//set volume (background music needs to be quieter, so it gets a .1f multiplier
+		//set volume (background music needs to be quieter, so it gets a .1f multiplier	
 		p1Win->setVolume(sound_vol.getVolume());
-		//play background music on loop
+		//play background music on loop	
 		p1Win->setPaused(false);
-		//file path
+		//file path	
 		std::string applausePath = FileUtils::getInstance()->fullPathForFilename("audio/applause.wav");
-		//create sound
+		//create sound	
 		system->createSound(applausePath.c_str(), FMOD_LOOP_OFF, 0, &applause_sound);
-		//init
+		//init	
 		system->playSound(applause_sound, 0, true, &applause);
-		//set volume
+		//set volume	
 		applause->setVolume(sound_vol.getVolume());
-		//play applause
+		//play applause	
 		applause->setPaused(false);
-
 	}
 	else {
 		CCLOG("Player 2 Wins");
@@ -79,27 +80,26 @@ bool PostGameScene::init() {
 		label1->setAnchorPoint(cocos2d::Vec2(0, 0));
 		label1->setPosition(cocos2d::Vec2(winSize.width / 4, winSize.height / 2));
 		this->addChild(label1, 1);
-		//file path
+		//file path	
 		std::string p2WinPath = FileUtils::getInstance()->fullPathForFilename("audio/p2_win.wav");
-		//create sound
+		//create sound	
 		system->createSound(p2WinPath.c_str(), FMOD_LOOP_OFF, 0, &p2WinSound);
-		//init sound but set to pause until volume set
+		//init sound but set to pause until volume set	
 		system->playSound(p2WinSound, 0, true, &p2Win);
-		//set volume (background music needs to be quieter, so it gets a .1f multiplier
+		//set volume (background music needs to be quieter, so it gets a .1f multiplier	
 		p2Win->setVolume(sound_vol.getVolume());
-		//play background music on loop
+		//play background music on loop	
 		p2Win->setPaused(false);
-		//file path
+		//file path	
 		std::string applausePath = FileUtils::getInstance()->fullPathForFilename("audio/applause.wav");
-		//create sound
+		//create sound	
 		system->createSound(applausePath.c_str(), FMOD_LOOP_OFF, 0, &applause_sound);
-		//init
+		//init	
 		system->playSound(applause_sound, 0, true, &applause);
-		//set volume
+		//set volume	
 		applause->setVolume(sound_vol.getVolume());
-		//play applause
+		//play applause	
 		applause->setPaused(false);
-
 	}
 	auto label2 = Label::createWithSystemFont("Press A/B to return to the Main Menu", "Arial", 50);
 	label2->setAnchorPoint(cocos2d::Vec2(0,0));

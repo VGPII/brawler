@@ -62,7 +62,7 @@ bool OptionsMenu::init() {
 	OptionMenuBackground->setScaleY((winSize.height / OptionMenuBackground->getContentSize().height) * scaleYFactor);
 	OptionMenuBackground->setVisible(true);
 	this->addChild(OptionMenuBackground);
-	
+
 	//audio title
 	TitleAudio = Sprite::create("optionsMenuAssets/audio_title.png");
 	TitleAudio->setPosition(winSize.width / 2, winSize.height / 1.1);
@@ -115,34 +115,34 @@ bool OptionsMenu::init() {
 
 	//start arrows for sound
 	SoundArrowLeftOne = Sprite::create("optionsMenuAssets/sound_arrows_left_1.png");
-	SoundArrowLeftOne->setPosition(winSize.width / 2.6, winSize.height*(0.4));
+	SoundArrowLeftOne->setPosition(winSize.width / 2.6, winSize.height * (0.4));
 	SoundArrowLeftOne->setVisible(true);
 	this->addChild(SoundArrowLeftOne);
 
 	SoundArrowLeftTwo = Sprite::create("optionsMenuAssets/sound_arrows_left_2.png");
-	SoundArrowLeftTwo->setPosition(winSize.width / 2.6, winSize.height*(0.4));
+	SoundArrowLeftTwo->setPosition(winSize.width / 2.6, winSize.height * (0.4));
 	SoundArrowLeftTwo->setVisible(false);
 	this->addChild(SoundArrowLeftTwo);
 
 	SoundArrowRightOne = Sprite::create("optionsMenuAssets/sound_arrows_right_2.png");
-	SoundArrowRightOne->setPosition(winSize.width / 1.6, winSize.height*(0.4));
+	SoundArrowRightOne->setPosition(winSize.width / 1.6, winSize.height * (0.4));
 	SoundArrowRightOne->setVisible(true);
 	this->addChild(SoundArrowRightOne);
 
 	SoundArrowRightTwo = Sprite::create("optionsMenuAssets/sound_arrows_right_1.png");
-	SoundArrowRightTwo->setPosition(winSize.width / 1.6, winSize.height*(0.4));
+	SoundArrowRightTwo->setPosition(winSize.width / 1.6, winSize.height * (0.4));
 	SoundArrowRightTwo->setVisible(false);
 	this->addChild(SoundArrowRightTwo);
 
 
 	//back
 	OneBackButton = Sprite::create("optionsMenuAssets/back_button_1.png");
-	OneBackButton->setPosition(winSize.width / 2, winSize.height*(0.2));
+	OneBackButton->setPosition(winSize.width / 2, winSize.height * (0.2));
 	OneBackButton->setVisible(true);
 	this->addChild(OneBackButton);
 
 	TwoBackButton = Sprite::create("optionsMenuAssets/back_button_2.png");
-	TwoBackButton->setPosition(winSize.width / 2, winSize.height* (0.2));
+	TwoBackButton->setPosition(winSize.width / 2, winSize.height * (0.2));
 	TwoBackButton->setVisible(false);
 	this->addChild(TwoBackButton);
 
@@ -191,7 +191,7 @@ void OptionsMenu::getOptionsControllerInput(float dt) {
 		if (axes[1] > deadZone) {
 			cursorPosition += 1;
 		}
-		if (axes[1] < deadZone*-1) {
+		if (axes[1] < deadZone * -1) {
 			cursorPosition -= 1;
 		}
 		if (buttons[0] == 1) {

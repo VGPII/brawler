@@ -2,8 +2,8 @@
 #ifndef __PLAYER_H__	
 #define __PLAYER_H__
 #include "fmod.hpp"	
-#include "AudioManager.h"	
 #include "Item.h"
+#include "AudioManager.h"	
 #pragma once
 
 using namespace cocos2d;
@@ -31,6 +31,7 @@ public:
 	void setFootPos(Vec2);
 	void reset();
 	bool ComboChain(float dtF, float dtI);
+	void playKnockBackAnimation();
 	int numTimesAttacked;
 	float comboStartTime;
 	bool beginComboChain;
@@ -40,7 +41,6 @@ public:
 	Sprite* playerDamageIcon1;
 	Sprite* itemSwordIcon;
 	Sprite* itemShieldIcon;
-
 	Label* damageLabel;
 	Vector<SpriteFrame*> JumpAnimation;
 	Animate* jumpAnimate;
@@ -54,6 +54,11 @@ public:
 	int NUM_ATTACK_FRAMES;
 	Vector<SpriteFrame*> attackAnimation;
 	Animate* attackAnimate;
+	int NUM_REACT_FRAMES;
+	Vector<SpriteFrame*> reactAnimationLow;
+	Animate* reactAnimateLow;
+	Vector<SpriteFrame*> reactAnimationHigh;
+	Animate* reactAnimateHigh;
 	Vec2 tileCoordForPosition(Vec2 position); // Converting pixel values to x,y coordinates on the tilemap
 	Rect boundingBox;
 	TMXLayer* _background;
@@ -67,6 +72,8 @@ public:
 	Action* jumping;// tag = 3
 	Action* idling;// tag = 0
 	Action* attacking; //tag =2
+	Action* reactingLow; // tag ==4
+	Action* reactingHigh; //tag =5
 	float damage;
 	float comboCooldown;
 	float comboCooldownTime;
@@ -88,17 +95,19 @@ public:
 	bool canJump;
 	bool onGround;
 	bool attackButtonPressed;
+	float maxVel = 500;
 	float radius;
 	float height;
 	float width;
-	FMOD::System *system;
-	FMOD::Sound *death_sound;
-	FMOD::Sound *jump_sound;
-	FMOD::Channel *death_channel;
-	FMOD::Channel *jump_channel;
-	FMOD::Channel *item_channel;
-	FMOD::Sound *item_sound;
+	FMOD::System* system;
+	FMOD::Sound* death_sound;
+	FMOD::Sound* jump_sound;
+	FMOD::Channel* death_channel;
+	FMOD::Channel* jump_channel;
+	FMOD::Channel* item_channel;
+	FMOD::Sound* item_sound;
 	AudioManager sound_vol;
+
 
 };
 #endif // __PLAYER_H__

@@ -35,16 +35,14 @@ class OptionsMenu : public cocos2d::Scene
 {
 public:
 	static cocos2d::Scene* createScene();
-	//General Methods needed for a menu
+	///General Methods needed for a menu	
 	virtual bool init();
 	void update(float dt);
 	void updateOptionsMenu();
 	void getOptionsControllerInput(float dt);
 	void exitOptionsMenu();
-
 	bool buttonCooldown;
 	float volumeValue;
-
 	bool optionsMenuItemSelected;
 	bool controllerPresence;
 	const float* axes;
@@ -64,19 +62,19 @@ public:
 	Sprite* FiveSoundBar;
 	Sprite* SixSoundBar;
 	Sprite* SevenSoundBar;
-
 	Sprite* SoundArrowLeftOne;
 	Sprite* SoundArrowLeftTwo;
-
 	Sprite* SoundArrowRightOne;
 	Sprite* SoundArrowRightTwo;
-
 	Sprite* SoundEffectsTitle;
-	int volumeCount; //was set to nothing
+	int volumeCount; //was set to nothing	
 	int cursorPosition;
-	int NUM_OF_OPTION_MENU_ITEMS = 3; //2 sound arrow, one back button
+	int NUM_OF_OPTION_MENU_ITEMS = 3; //2 sound arrow, one back button	
 	int previousCursorPosition;
 	bool cursorMoved;
 };
 
-#endif // __OPTIONSMENU__H__
+#endif //__OPTIONSMENU_H__
+
+
+
