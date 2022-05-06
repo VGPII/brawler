@@ -13,7 +13,7 @@ class Player
 public:
 	//CREATE_FUNC(Player);
 
-	virtual bool init(int gravStrength, TMXTiledMap* initMap, Rect boundingBox, int playerNumber);
+	virtual bool init(int gravStrength, TMXTiledMap* initMap, Rect boundingBox, int playerNumber, float volume = 0.5f);
 	void update(float);
 	void setItem(Item* newItem);
 	bool InAir(Vec2 position);
@@ -91,15 +91,13 @@ public:
 	float radius;
 	float height;
 	float width;
-	FMOD::System* system;
-	FMOD::Sound* background_sound;
-	FMOD::Sound* death_sound;
-	FMOD::Sound* jump_sound;
-	FMOD::Sound* attack_sound;
-	FMOD::Channel* background_channel;
-	FMOD::Channel* death_channel;
-	FMOD::Channel* attack_channel;
-	FMOD::Channel* jump_channel;
+	FMOD::System *system;
+	FMOD::Sound *death_sound;
+	FMOD::Sound *jump_sound;
+	FMOD::Channel *death_channel;
+	FMOD::Channel *jump_channel;
+	FMOD::Channel *item_channel;
+	FMOD::Sound *item_sound;
 	AudioManager sound_vol;
 
 };

@@ -37,9 +37,9 @@ using namespace cocos2d;
 class MainMenu : public cocos2d::Scene
 {
 public:
-	static cocos2d::Scene* createScene(bool prevbutton);
+	static cocos2d::Scene* createScene(bool prevbutton, float volume = 0.5f);
 
-	virtual bool init();
+	virtual bool init(float volume = 0.5f);
 	void update(float dt);
 	void updateMenu();
 	void getControllerInput(float dt);
@@ -67,12 +67,9 @@ public:
 	FMOD::System *system;
 	FMOD::Sound *background_sound;
 	FMOD::Sound *intro_sound;
-	FMOD::Channel *background_channel;
 	FMOD::Channel *intro_channel;
 	AudioManager sound_vol;
+	//OptionsMenu volume_level;
 };
 
 #endif // __MAINMENU__H__
-
-
-

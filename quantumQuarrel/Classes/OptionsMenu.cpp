@@ -166,7 +166,7 @@ void OptionsMenu::exitOptionsMenu() {
 	if (cursorPosition == 3) { //was 2
 		//Load main Menu
 		bool prevbutton = false;
-		auto mainMenu = MainMenu::createScene(prevbutton);
+		auto mainMenu = MainMenu::createScene(prevbutton, volumeValue);
 		Director::getInstance()->replaceScene(mainMenu);
 	}
 }
@@ -267,44 +267,44 @@ void OptionsMenu::updateOptionsMenu() {
 			OneSoundBar->setVisible(true);
 			SevenSoundBar->setVisible(false);
 			TwoSoundBar->setVisible(false);
-			volumeValue = 1.0;
+			volumeValue = 0.1f;
 		}
 		if (volumeCount == 2) {
 			TwoSoundBar->setVisible(true);
 			OneSoundBar->setVisible(false);
 			ThreeSoundBar->setVisible(false);
-			volumeValue = 2.0;
+			volumeValue = 0.2f;
 		}
 		if (volumeCount == 3) {
 			ThreeSoundBar->setVisible(true);
 			TwoSoundBar->setVisible(false);
 			FourSoundBar->setVisible(false);
-			volumeValue = 3.0;
+			volumeValue = 0.3f;
 		}
 
 		if (volumeCount == 4) {
 			FourSoundBar->setVisible(true);
 			ThreeSoundBar->setVisible(false);
 			FiveSoundBar->setVisible(false);
-			volumeValue = 4.0;
+			volumeValue = 0.4f;
 		}
 		if (volumeCount == 5) {
 			FiveSoundBar->setVisible(true);
 			FourSoundBar->setVisible(false);
 			SixSoundBar->setVisible(false);
-			volumeValue = 5.0;
+			volumeValue = 0.5f;
 		}
 		if (volumeCount == 6) {
 			SixSoundBar->setVisible(true);
 			FiveSoundBar->setVisible(false);
 			SevenSoundBar->setVisible(false);
-			volumeValue = 6.0;
+			volumeValue = 0.6f;
 		}
 		if (volumeCount == 7) {
 			SevenSoundBar->setVisible(true);
 			SixSoundBar->setVisible(false);
 			OneSoundBar->setVisible(false);
-			volumeValue = 7.0;
+			volumeValue = 0.7f;
 		}
 
 	}

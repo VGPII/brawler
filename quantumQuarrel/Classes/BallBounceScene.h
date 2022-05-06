@@ -37,7 +37,7 @@ using namespace cocos2d;
 class BallBounce : public cocos2d::Scene
 {
 public:
-	static cocos2d::Scene* createScene();
+	static cocos2d::Scene* createScene(float volume = 0.5f);
 
 	virtual bool init();
 
@@ -85,6 +85,12 @@ public:
 	void drawBox(DrawNode* node, Vec2 bottomLeft, Vec2 topRight);
 	void drawBox(DrawNode* node, Rect rectangle, Color4F color);
 	
+	FMOD::Channel *attackMissChannel;
+	FMOD::Channel *attackHitChannel;
+	FMOD::Sound *attackMissSound;
+	FMOD::Sound *attackHitSound;
+	FMOD::System *system;
+	AudioManager sound_vol;
 };
 
 

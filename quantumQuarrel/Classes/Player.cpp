@@ -31,9 +31,11 @@ USING_NS_CC;
 #define IDLE_TAG 0
 #define NULL_TAG -1
 #define SPRITE_SCALE 0.55	
+float volume_animations;
 
-bool Player::init(int gravStrength, TMXTiledMap* initMap, Rect initBoundingBox, int playerNumberInit)
+bool Player::init(int gravStrength, TMXTiledMap* initMap, Rect initBoundingBox, int playerNumberInit, float volume)
 {
+	volume_animations = volume;
 	boundingBox = initBoundingBox;
 	_CurMap = initMap;
 	_background = _CurMap->getLayer("Background");
@@ -165,9 +167,9 @@ bool Player::init(int gravStrength, TMXTiledMap* initMap, Rect initBoundingBox, 
 	attackButtonPressed = false;
 	
 	//initialize the sound system, this is where the volume level is set from the options menu, for now it is hard coded at 0.5f	
-	sound_vol.setVolume(0.5f);
 	FMOD::System_Create(&system);
 	system->init(32, FMOD_INIT_NORMAL, nullptr);
+	sound_vol.setVolume(volume_animations);
 	return true;
 }
 void Player::loadAnimations() {
@@ -463,19 +465,8 @@ void Player::update(float dt) { // dt is in seconds
 		if (buttons[Y] == GLFW_PRESS) {
 			isAttacking = true;
 			attackButtonPressed = true;
-			//stop old attack sounds	
-			attack_channel->stop();
-			//file path	
-			std::string attack_path = FileUtils::getInstance()->fullPathForFilename("audio/attack_miss.wav");
-			//create sound	
-			system->createSound(attack_path.c_str(), FMOD_LOOP_OFF, 0, &attack_sound);
-			system->playSound(attack_sound, 0, true, &attack_channel);
-			//set volume	
-			attack_channel->setVolume(sound_vol.getVolume());
-			//play	
 			playerSprite->stopActionByTag(IDLE_TAG);
 			idling->setTag(NULL_TAG);
-			attack_channel->setPaused(false);
 			if (playerSprite->getActionByTag(ATTACK_TAG) == nullptr) {
 				attacking->setTag(ATTACK_TAG);
 				playerSprite->runAction(attacking);
@@ -487,6 +478,18 @@ void Player::update(float dt) { // dt is in seconds
 		if (buttons[X] == GLFW_PRESS) {
 			if (!hasItem) {
 				isPickingUp = true;
+
+				//stop old attack sounds	
+				item_channel->stop();
+				//file path	
+				std::string itemPath = FileUtils::getInstance()->fullPathForFilename("audio/pickup.wav");
+				//create sound	
+				system->createSound(itemPath.c_str(), FMOD_LOOP_OFF, 0, &item_sound);
+				system->playSound(item_sound, 0, true, &item_channel);
+				//set volume	
+				item_channel->setVolume(sound_vol.getVolume());
+				//play
+				item_channel->setPaused(false);
 			}
 		}
 		else {
