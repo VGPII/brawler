@@ -30,7 +30,7 @@ USING_NS_CC;
 #define WALK_TAG 1
 #define IDLE_TAG 0
 #define NULL_TAG -1
-#define SPRITE_SCALE 0.4	
+#define SPRITE_SCALE 0.55	
 
 bool Player::init(int gravStrength, TMXTiledMap* initMap, Rect initBoundingBox, int playerNumberInit)
 {
@@ -89,6 +89,19 @@ bool Player::init(int gravStrength, TMXTiledMap* initMap, Rect initBoundingBox, 
 		damageLabel->setAnchorPoint(cocos2d::Vec2(0, 0));
 		damageLabel->setPosition(playerDamageIcon1->getPosition().x+40, playerDamageIcon1->getPosition().y+25);
 		
+		itemSwordIcon = Sprite::create("/itemAssets/sword.png");
+		itemShieldIcon = Sprite::create("/itemAssets/shield.png");
+		
+		itemSwordIcon->setScale(0.4);
+		itemShieldIcon->setScale(0.4);
+		
+		itemSwordIcon->setPosition(playerDamageIcon3->getPosition() + Vec2(-60, -35));
+		itemShieldIcon->setPosition(playerDamageIcon3->getPosition() + Vec2(-60, -35));
+
+		itemSwordIcon->setVisible(false);
+		itemShieldIcon->setVisible(false);
+
+
 		loadAnimations();
 	}
 	else if (playerNumber == 2) {
@@ -115,6 +128,17 @@ bool Player::init(int gravStrength, TMXTiledMap* initMap, Rect initBoundingBox, 
 		damageLabel = Label::createWithSystemFont("0.0%", "Arial", 20);
 		damageLabel->setAnchorPoint(cocos2d::Vec2(0, 0));
 		damageLabel->setPosition(playerDamageIcon1->getPosition().x + 40, playerDamageIcon1->getPosition().y + 25);
+		itemSwordIcon = Sprite::create("/itemAssets/sword.png");
+		itemShieldIcon = Sprite::create("/itemAssets/shield.png");
+
+		itemSwordIcon->setScale(0.4);
+		itemShieldIcon->setScale(0.4);
+
+		itemSwordIcon->setPosition(playerDamageIcon3->getPosition());
+		itemShieldIcon->setPosition(playerDamageIcon3->getPosition());
+
+		itemSwordIcon->setVisible(false);
+		itemShieldIcon->setVisible(false);
 		loadAnimations();
 	}
 	
@@ -492,6 +516,19 @@ void Player::update(float dt) { // dt is in seconds
 	}
 	else {
 		setAttackBox(Rect(position.x - 3 * (width / 2), position.y - width / 4, width, height / 2));
+	}
+	if (hasItem) {
+		if (item->type == 0) {
+			itemShieldIcon->setVisible(true);
+			itemSwordIcon->setVisible(false);
+		}
+		if (item->type == 1) {
+			itemShieldIcon->setVisible(false);
+			itemSwordIcon->setVisible(true);
+		}
+	} else {
+		itemShieldIcon->setVisible(false);
+		itemSwordIcon->setVisible(false);
 	}
 	setHitBox(Rect(position.x - width / 2, position.y - height / 2, width, height));
 	position += velocity * dt;

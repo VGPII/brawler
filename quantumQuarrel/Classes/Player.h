@@ -38,6 +38,8 @@ public:
 	Sprite* playerDamageIcon3;
 	Sprite* playerDamageIcon2;
 	Sprite* playerDamageIcon1;
+	Sprite* itemSwordIcon;
+	Sprite* itemShieldIcon;
 
 	Label* damageLabel;
 	Vector<SpriteFrame*> JumpAnimation;

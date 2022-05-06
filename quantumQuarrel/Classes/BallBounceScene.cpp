@@ -46,7 +46,7 @@ bool BallBounce::init()
 		return false;
 	}
 	
-	debugMode = true; //Comment out to remove debugLines
+	//debugMode = true; //Comment out to remove debugLines
 
 	winSize = cocos2d::Director::getInstance()->getWinSize();
 	node = DrawNode::create(2);
@@ -77,6 +77,7 @@ bool BallBounce::init()
 	playerTwo->init(gravity, _MainMap, this->getBoundingBox(), 2);
 	item->init(gravity, RandomHelper::random_int(0, 1), _MainMap);
 
+
 	this->addChild(playerOne->playerSprite);
 	this->addChild(playerTwo->playerSprite);
 	this->addChild(item->itemSprite);
@@ -84,12 +85,16 @@ bool BallBounce::init()
 	this->addChild(playerOne->playerDamageIcon3);
 	this->addChild(playerOne->playerDamageIcon2);
 	this->addChild(playerOne->playerDamageIcon1);
+	this->addChild(playerOne->itemShieldIcon);
+	this->addChild(playerOne->itemSwordIcon);
 	this->addChild(playerOne->damageLabel);
 	
 	
 	this->addChild(playerTwo->playerDamageIcon3);
 	this->addChild(playerTwo->playerDamageIcon2);
 	this->addChild(playerTwo->playerDamageIcon1);
+	this->addChild(playerTwo->itemShieldIcon);
+	this->addChild(playerTwo->itemSwordIcon);
 	this->addChild(playerTwo->damageLabel);
 
 	//Creating the timer
@@ -97,6 +102,7 @@ bool BallBounce::init()
 	gameTimeSecs = gameTime - gameTimeMins * 60;
 	timerGUI = Label::createWithSystemFont(std::to_string(gameTimeMins) + ":" + std::to_string(gameTimeSecs)+ "0", "Arial", 20);
 	timerGUI->setAnchorPoint(cocos2d::Vec2(0, 0));
+	timerGUI->setColor(Color3B::BLACK);
 	auto gui = _MainMap->getObjectGroup("GUI");
 	ValueMap timerPos = gui->getObject("Timer");
 	timerGUI->setPosition(Vec2(timerPos.at("x").asInt() * _MainMap->getScaleX(), timerPos.at("y").asInt() * _MainMap->getScaleY()));
@@ -351,12 +357,12 @@ void BallBounce::calculateKnockback(Player* Reciver, Player* Attacker) {
 void BallBounce::dealDamage(Player* Reciver, Player* Attacker, float dmg) {
 	if (Attacker->hasItem) {
 		if (Attacker->item->type == 1) {
-			dmg *= 1.1;
+			dmg *= 1.5;
 		}
 	}
 	if (Reciver->hasItem) {
 		if (Reciver->item->type == 0) {
-			dmg *= 0.9;
+			dmg *= 0.5;
 		}
 	}
 	Reciver->damage += dmg;
