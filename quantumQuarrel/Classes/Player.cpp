@@ -153,7 +153,7 @@ void Player::loadAnimations() {
 		//Loading jumping animation
 		for (int i = 1; i <= NUM_JUMP_FRAMES; i++) {
 			sprintf(str, "/PlayerAnimation/player1/jump/jump_%i.png", i);
-			auto frame = SpriteFrame::create(str, Rect(position.x, position.y, 205, 307), false, Vec2(0, 0), Size(205, 307));
+			auto frame = SpriteFrame::create(str, Rect(position.x, position.y, 205, 325), false, Vec2(0, 0), Size(205, 325));
 			JumpAnimation.pushBack(frame);
 		}
 		auto tmpAnimation = Animation::createWithSpriteFrames(JumpAnimation, 0.12f);
@@ -164,7 +164,7 @@ void Player::loadAnimations() {
 		//Loading Walking animation
 		for (int i = 1; i <= NUM_WALK_FRAMES; i++) {
 			sprintf(str, "/PlayerAnimation/player1/walk/Walking_%i.png", i);
-			auto frame = SpriteFrame::create(str, Rect(position.x, position.y, 369, 572), false, Vec2(0, 0), Size(369, 572));
+			auto frame = SpriteFrame::create(str, Rect(position.x, position.y, 205, 325), false, Vec2(0, 0), Size(205, 325));
 			walkAnimation.pushBack(frame);
 		}
 		tmpAnimation = Animation::createWithSpriteFrames(walkAnimation, 0.09f);
@@ -176,7 +176,7 @@ void Player::loadAnimations() {
 		//Will fully implement later
 		for (int i = 1; i <= NUM_IDLE_FRAMES; i++) {
 			sprintf(str, "/PlayerAnimation/player1/hit_reaction/react_%i.png", i);
-			auto frame = SpriteFrame::create(str, Rect(position.x, position.y, 124, 202), false, Vec2(0, 0), Size(124, 202));
+			auto frame = SpriteFrame::create(str, Rect(position.x, position.y, 205, 325), false, Vec2(0, 0), Size(205, 325));
 			idleAnimation.pushBack(frame);
 		}
 		tmpAnimation = Animation::createWithSpriteFrames(idleAnimation, 0.09f);
@@ -186,7 +186,7 @@ void Player::loadAnimations() {
 
 		for (int i = 1; i < NUM_ATTACK_FRAMES; i++) {
 			sprintf(str, "/PlayerAnimation/player1/attack/punching_%i.png", i);
-			auto frame = SpriteFrame::create(str, Rect(position.x, position.y, 254, 310), false, Vec2(0, 0), Size(254, 310));
+			auto frame = SpriteFrame::create(str, Rect(position.x, position.y, 205, 325), false, Vec2(0, 0), Size(205, 325));
 			attackAnimation.pushBack(frame);
 		}
 		tmpAnimation = Animation::createWithSpriteFrames(attackAnimation, 0.09f);
@@ -198,7 +198,7 @@ void Player::loadAnimations() {
 		//Loading jumping animation
 		for (int i = 1; i <= NUM_JUMP_FRAMES; i++) {
 			sprintf(str, "/PlayerAnimation/player2/jump/jump_%i.png", i);
-			auto frame = SpriteFrame::create(str, Rect(position.x, position.y, 205, 307), false, Vec2(0, 0), Size(205, 307));
+			auto frame = SpriteFrame::create(str, Rect(position.x, position.y, 205, 325), false, Vec2(0, 0), Size(205, 325));
 			JumpAnimation.pushBack(frame);
 		}
 		auto tmpAnimation = Animation::createWithSpriteFrames(JumpAnimation, 0.12f);
@@ -209,7 +209,7 @@ void Player::loadAnimations() {
 		//Loading Walking animation
 		for (int i = 1; i <= NUM_WALK_FRAMES; i++) {
 			sprintf(str, "/PlayerAnimation/player2/walk/Walking_%i.png", i);
-			auto frame = SpriteFrame::create(str, Rect(position.x, position.y, 369, 572), false, Vec2(0, 0), Size(369, 572));
+			auto frame = SpriteFrame::create(str, Rect(position.x, position.y, 205, 325), false, Vec2(0, 0), Size(205, 325));
 			walkAnimation.pushBack(frame);
 		}
 		tmpAnimation = Animation::createWithSpriteFrames(walkAnimation, 0.09f);
@@ -221,7 +221,7 @@ void Player::loadAnimations() {
 		//Will fully implement later
 		for (int i = 1; i <= NUM_IDLE_FRAMES; i++) {
 			sprintf(str, "/PlayerAnimation/player2/hit_reaction/react_%i.png", i);
-			auto frame = SpriteFrame::create(str, Rect(position.x, position.y, 124, 202), false, Vec2(0, 0), Size(124, 202));
+			auto frame = SpriteFrame::create(str, Rect(position.x, position.y, 205, 325), false, Vec2(0, 0), Size(205, 325));
 			idleAnimation.pushBack(frame);
 		}
 		tmpAnimation = Animation::createWithSpriteFrames(idleAnimation, 0.09f);
@@ -231,7 +231,7 @@ void Player::loadAnimations() {
 
 		for (int i = 1; i < NUM_ATTACK_FRAMES; i++) {
 			sprintf(str, "/PlayerAnimation/player2/attack/punching_%i.png", i);
-			auto frame = SpriteFrame::create(str, Rect(position.x, position.y, 254, 310), false, Vec2(0, 0), Size(254, 310));
+			auto frame = SpriteFrame::create(str, Rect(position.x, position.y, 205, 325), false, Vec2(0, 0), Size(205, 325));
 			attackAnimation.pushBack(frame);
 		}
 		tmpAnimation = Animation::createWithSpriteFrames(attackAnimation, 0.09f);
@@ -305,7 +305,7 @@ void Player::update(float dt) { // dt is in seconds
 			walking->setTag(NULL_TAG);
 			if (playerSprite->getActionByTag(IDLE_TAG) == nullptr) {
 				idling->setTag(IDLE_TAG);
-				playerSprite->setScale(SPRITE_SCALE * 2.8);
+				playerSprite->setScale(SPRITE_SCALE);
 				playerSprite->runAction(idling);
 				
 			}	
@@ -381,7 +381,6 @@ void Player::update(float dt) { // dt is in seconds
 				playerSprite->runAction(walking);
 				playerSprite->setScaleX(SPRITE_SCALE*orientation);
 				playerSprite->setScaleY(SPRITE_SCALE);
-				//playerSprite->setScale(0.3);
 
 			}
 		}
@@ -397,8 +396,6 @@ void Player::update(float dt) { // dt is in seconds
 				playerSprite->runAction(walking);
 				playerSprite->setScaleX(SPRITE_SCALE*orientation);
 				playerSprite->setScaleY(SPRITE_SCALE);
-				//playerSprite->setScaleX(-0.3);	
-				//playerSprite->setScaleY(0.3);
 
 			}
 		}
@@ -425,8 +422,8 @@ void Player::update(float dt) { // dt is in seconds
 				if (playerSprite->getActionByTag(JUMP_TAG) == nullptr) {
 					jumping->setTag(JUMP_TAG);
 					playerSprite->runAction(jumping);
-					playerSprite->setScaleY(SPRITE_SCALE * 2.5);
-					playerSprite->setScaleX(SPRITE_SCALE*orientation* 2.5);
+					playerSprite->setScaleY(SPRITE_SCALE);
+					playerSprite->setScaleX(SPRITE_SCALE*orientation);
 					//playerSprite->setScale(0.3);
 				}
 
@@ -440,7 +437,6 @@ void Player::update(float dt) { // dt is in seconds
 			}
 		}
 		if (buttons[Y] == GLFW_PRESS) {
-			CCLOG("Y is Pressed");
 			isAttacking = true;
 			attackButtonPressed = true;
 			//stop old attack sounds	
@@ -459,13 +455,12 @@ void Player::update(float dt) { // dt is in seconds
 			if (playerSprite->getActionByTag(ATTACK_TAG) == nullptr) {
 				attacking->setTag(ATTACK_TAG);
 				playerSprite->runAction(attacking);
-				playerSprite->setScaleX(0.6 * orientation);
-				playerSprite->setScaleY(0.6);
+				playerSprite->setScaleX(SPRITE_SCALE * orientation);
+				playerSprite->setScaleY(SPRITE_SCALE);
 
 			}
 		}
 		if (buttons[X] == GLFW_PRESS) {
-			CCLOG("X is Pressed");
 			if (!hasItem) {
 				isPickingUp = true;
 			}
